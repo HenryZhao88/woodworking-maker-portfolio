@@ -65,7 +65,7 @@ test("strip skew settles back to zero after scrolling stops", async ({ page }) =
   await scrollPin(page, "[data-process]", 0.2);
   const start = await page.evaluate(() => scrollY);
   for (let i = 1; i <= 8; i++) {
-    await page.evaluate((y) => (window as any).__lenis.scrollTo(y, { immediate: true }), start + i * 220);
+    await page.evaluate((y) => (window as unknown as { __lenis: { scrollTo(y: number, o: object): void } }).__lenis.scrollTo(y, { immediate: true }), start + i * 220);
     await page.waitForTimeout(40);
   }
   await page.waitForTimeout(2000);

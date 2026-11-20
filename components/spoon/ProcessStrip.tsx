@@ -78,7 +78,10 @@ export function ProcessStrip({ process }: { process: Process }) {
         const skewTick = () => {
           if (reduced) return;
           const st = tween.scrollTrigger as ScrollTrigger;
-          if (!st.isActive) return skewTo(0);
+          if (!st.isActive) {
+            skewTo(0);
+            return;
+          }
           const v = (window as unknown as { __lenis?: { velocity: number } }).__lenis?.velocity ?? 0;
           skewTo(gsap.utils.clamp(-6, 6, -v / 9));
         };
