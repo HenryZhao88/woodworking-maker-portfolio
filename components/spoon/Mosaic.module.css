@@ -8,3 +8,7 @@
 .rule { width: 60px; height: 3px; background: var(--gold); }
 .back { font-family: var(--font-mono), monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
 .back:hover { color: var(--gold); }
+@media (max-width: 700px) {
+  .grid { columns: 2; column-gap: 10px; }
+  .tile { margin-bottom: 10px; }
+}

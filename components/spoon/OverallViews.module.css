@@ -23,3 +23,11 @@
 }
 .view { pointer-events: none; }
 .view[data-active] figure { pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .pin { height: auto; display: block; padding: calc(var(--nav-h) + 16vh) var(--gutter) 12vh; overflow: visible; }
+  .copy { position: static; margin-bottom: 6vh; }
+  .stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; height: auto; perspective: none; }
+  .view { position: static; display: block; }
+  .view figure { width: 100% !important; }
+  .counter { display: none; }
+}

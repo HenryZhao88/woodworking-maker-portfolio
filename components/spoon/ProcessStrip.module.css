@@ -49,7 +49,7 @@
 .barTrack { flex: 1; height: 1px; background: var(--line); position: relative; }
 .bar { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(0); }
 
-@media (max-width: 767px) {
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .pin { height: auto; overflow: visible; perspective: 1200px; }
   .rail { display: none; }
   .track { position: relative; flex-direction: column; align-items: stretch; padding: 0 var(--gutter) 10vh; gap: 12vh; }

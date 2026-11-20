@@ -16,6 +16,11 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
       const frames = gsap.utils.toArray<HTMLElement>("[data-view]", pin);
       const counter = pin.querySelector<HTMLElement>("[data-counter]")!;
       const reduced = prefersReducedMotion();
+      if (reduced) {
+        // Static: all three views side by side, no pinning.
+        frames.forEach((f) => f.setAttribute("data-active", ""));
+        return;
+      }
       gsap.set(frames.slice(1), { opacity: 0 });
 
       const tl = gsap.timeline({

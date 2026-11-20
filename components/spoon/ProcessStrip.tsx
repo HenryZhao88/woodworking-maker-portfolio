@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion, exposePin } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP, exposePin } from "@/lib/gsap";
 import type { Project } from "@/content/types";
 import styles from "./ProcessStrip.module.css";
 
@@ -27,8 +27,7 @@ export function ProcessStrip({ process }: { process: Process }) {
       const bar = pin.querySelector<HTMLElement>("[data-bar]");
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 768px)", () => {
-        const reduced = prefersReducedMotion();
+      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
         const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
         const skewTo = gsap.quickTo(track, "skewX", { duration: 0.5, ease: "power3" });
         const setters = cards.map((c) => ({
@@ -37,7 +36,6 @@ export function ProcessStrip({ process }: { process: Process }) {
         }));
 
         const arc = () => {
-          if (reduced) return;
           const W = window.innerWidth;
           cards.forEach((c, i) => {
             const r = c.getBoundingClientRect();
@@ -55,7 +53,7 @@ export function ProcessStrip({ process }: { process: Process }) {
             pin: true,
             start: "top top",
             end: () => `+=${distance()}`,
-            scrub: reduced ? true : 0.8,
+            scrub: 0.8,
             invalidateOnRefresh: true,
             onRefresh: (self) => exposePin(pin, self),
             onUpdate: (self) => {
@@ -76,7 +74,6 @@ export function ProcessStrip({ process }: { process: Process }) {
         arc();
         // Skew follows live scroll velocity every frame, so it eases back to 0 when scrolling stops.
         const skewTick = () => {
-          if (reduced) return;
           const st = tween.scrollTrigger as ScrollTrigger;
           if (!st.isActive) {
             skewTo(0);
@@ -95,8 +92,7 @@ export function ProcessStrip({ process }: { process: Process }) {
         };
       });
 
-      mm.add("(max-width: 767px)", () => {
-        if (prefersReducedMotion()) return;
+      mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
         cards.forEach((c) =>
           gsap.fromTo(
             c,

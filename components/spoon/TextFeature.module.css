@@ -34,3 +34,4 @@
 }
 /* The WebGL plane performs the grain reveal itself. */
 :global(html:not([data-quality="fallback"])) .media:has([data-gl-ready]) .slats { display: none; }
+@media (prefers-reduced-motion: reduce) { .slats { display: none; } }
