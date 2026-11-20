@@ -63,7 +63,7 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
         <div className={styles.copy}>
           <span className="eyebrow">The finished piece</span>
           <RevealText as="h2" split="words" className={styles.h} id="finished-h">
-            Three ways around.
+            From every side.
           </RevealText>
         </div>
         <div className={styles.stage} data-gl-effect="displace">

@@ -31,7 +31,7 @@ export default function WoodenSpoon() {
       <Hero title={p.title} index="01" />
       <About about={p.about} />
       <ProcessStrip process={p.process} />
-      <TextFeature id="favorite-h" eyebrow="Favorite parts" variant="grain" {...p.favorite} />
+      <TextFeature id="favorite-h" eyebrow="Favorite part" variant="grain" {...p.favorite} />
       <TextFeature id="challenging-h" eyebrow="Most challenging" variant="wipe" {...p.challenging} />
       <OverallViews views={p.finished.overall} />
       <DetailDive details={p.finished.details} />
