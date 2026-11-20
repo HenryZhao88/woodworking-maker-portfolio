@@ -85,13 +85,13 @@ export const projects: Project[] = [
         {
           label: "Finishing",
           when: "Nov 17",
-          caption: "Oil went on last. Once it dried, I buffed it to a soft shine.",
+          caption: "I oiled last. Once it dried overnight, I buffed it with wax to make it shinier.",
           images: [proc(13, "The oiled spoon drying on a paper towel")],
         },
       ],
     },
     favorite: {
-      heading: "The part I loved.",
+      heading: "Favorite part",
       body: [
         "My favorite moment was wiping on the oil. For weeks the spoon had been pale and dusty from all the sanding.",
         "Then one coat went on and everything changed. Rings and swirls I had never noticed showed up all over the bowl, *like they had been hiding in there all along*.",

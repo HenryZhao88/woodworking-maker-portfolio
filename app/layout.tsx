@@ -30,6 +30,12 @@ const zodiak = localFont({
     { path: "./fonts/zodiak-400.woff2", weight: "400", style: "normal" },
   ],
 });
+// Boska (Fontshare): high-contrast display serif for stage names and big numerals.
+const boska = localFont({
+  variable: "--font-numeral",
+  display: "swap",
+  src: [{ path: "./fonts/boska-500.woff2", weight: "500" }],
+});
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -41,7 +47,7 @@ export const viewport: Viewport = { themeColor: "#0e0b08" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${mono.variable}`}>
+    <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${boska.variable} ${mono.variable}`}>
       <body>
         <SmoothScroll>
           <QualityGate />

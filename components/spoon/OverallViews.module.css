@@ -15,7 +15,7 @@
   text-transform: uppercase;
   z-index: 5;
 }
-.counter [data-counter] { font-family: var(--font-display), sans-serif; font-weight: 500; font-size: clamp(48px, 6vw, 96px); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: var(--gold); }
+.counter [data-counter] { font-family: var(--font-numeral), Georgia, serif; font-style: normal; font-weight: 500; font-size: clamp(52px, 6.4vw, 104px); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--gold); }
 .of { color: var(--muted); font-size: 13px; }
 .label { font-size: 11px; color: var(--muted); margin-left: 12px; }
 @media (max-width: 767px) {

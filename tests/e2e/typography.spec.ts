@@ -15,3 +15,9 @@ test("type system: Switzer for titles and text, Zodiak italic as the accent voic
   const html = await page.content();
   expect(html).not.toMatch(/fraunces/i);
 });
+
+test("process stage names and the overall-view counter use Boska, upright", async ({ page }) => {
+  await page.goto("/wooden-spoon");
+  expect(await fam(page, "[data-stage] h3")).toMatch(/boska.*\|normal/i);
+  expect(await fam(page, "[data-counter]")).toMatch(/boska.*\|normal/i);
+});

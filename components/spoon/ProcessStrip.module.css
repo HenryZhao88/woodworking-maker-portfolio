@@ -18,7 +18,7 @@
 .stageHead { width: 260px; flex: none; display: flex; flex-direction: column; gap: 14px; align-self: center; }
 .when { color: var(--muted); }
 .stageNum { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--gold); letter-spacing: 0.2em; }
-.stageLabel { font-size: clamp(34px, 3.2vw, 56px); line-height: 1; }
+.stageLabel { font-family: var(--font-numeral), Georgia, serif; font-style: normal; font-weight: 500; letter-spacing: -0.02em; font-size: clamp(36px, 3.4vw, 60px); line-height: 1; }
 .stageCaption { color: var(--muted); font-size: 15px; }
 .card {
   position: relative;

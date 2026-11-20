@@ -8,7 +8,8 @@ import type { ProjectImage } from "@/content/types";
 import styles from "./TextFeature.module.css";
 
 type Props = {
-  eyebrow: string;
+  /** Small label above the heading; omit when the heading says it all. */
+  eyebrow?: string;
   heading: string;
   body: string[];
   quote?: string;
@@ -44,7 +45,7 @@ export function TextFeature({ eyebrow, heading, body, quote, image, variant, id 
 
   return (
     <section ref={root} className={`${styles.feature} ${styles[variant]}`} aria-labelledby={id}>
-      <span className="eyebrow">{eyebrow}</span>
+      {eyebrow && <span className="eyebrow">{eyebrow}</span>}
       <RevealText as="h2" split="words" className={styles.h} id={id} data-big="">
         {heading}
       </RevealText>
