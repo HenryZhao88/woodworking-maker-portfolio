@@ -41,7 +41,7 @@ export default function Home() {
           {spoon.title}
         </RevealText>
         <RevealText as="p" className={styles.teaserCopy}>
-          A spoon carved by hand from a single board — every cut, curve and mistake along the way.
+          A spoon carved by hand from a single block of wood. Every cut, curve and mistake along the way.
         </RevealText>
         <Link href={`/${spoon.slug}`} className={styles.teaserLink} id="teaser-heading">
           <span>Enter the project</span>

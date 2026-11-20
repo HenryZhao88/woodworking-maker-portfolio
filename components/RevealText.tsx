@@ -35,6 +35,7 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
       const s = SplitText.create(el, {
         type: split === "chars" ? "lines,words,chars" : split === "words" ? "lines,words" : "lines",
         mask: "lines",
+        linesClass: "rt-line",
         autoSplit: true,
         // Words/lines stay readable as-is; letter splits are aria-hidden and a screen-reader copy carries the text.
         aria: split === "chars" ? "hidden" : "none",

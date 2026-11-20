@@ -10,7 +10,7 @@ export function Nav() {
   const pathname = usePathname();
   return (
     <header className={styles.bar}>
-      <Link href="/" className={styles.logo} data-flip-id="site-title" aria-label="Maker Portfolio — home">
+      <Link href="/" className={styles.logo} data-flip-id="site-title" aria-label="Maker Portfolio, home">
         <span className={styles.logoMark} aria-hidden />
         <span>Maker Portfolio</span>
       </Link>

@@ -3,6 +3,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
+import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import type { ProjectImage, TextBlock } from "@/content/types";
 import styles from "./Mosaic.module.css";
@@ -45,7 +46,7 @@ export function Mosaic({ impression, images }: { impression: TextBlock; images: 
         </RevealText>
         {impression.body.map((t, i) => (
           <RevealText key={i} className={styles.p}>
-            {t}
+            <Rich text={t} />
           </RevealText>
         ))}
       </div>

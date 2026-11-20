@@ -33,7 +33,7 @@ const zodiak = localFont({
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "Maker Portfolio — Henry Zhao", template: "%s — Maker Portfolio" },
+  title: { default: "Maker Portfolio · Henry Zhao", template: "%s · Maker Portfolio" },
   description: "A woodworking maker portfolio by Henry Zhao.",
 };
 

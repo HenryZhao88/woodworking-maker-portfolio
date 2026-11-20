@@ -19,7 +19,7 @@ function validFixture(processCount = 12): Project {
     navLabel: "Fixture",
     status: "published",
     about: { heading: "About", body: ["b"], image: img(1, "feature") },
-    process: { heading: "Process", intro: "i", stages: [{ label: "S", caption: "c", images: procImgs }] },
+    process: { heading: "Process", intro: "i", stages: [{ label: "S", when: "Oct 1", caption: "c", images: procImgs }] },
     favorite: { heading: "Fav", body: ["b"], image: img(2, "feature") },
     challenging: { heading: "Hard", body: ["b"], image: img(3, "feature") },
     finished: { overall: [1, 2, 3].map((n) => img(n, "overall")), details: [1, 2, 3].map((n) => img(n, "detail")) },

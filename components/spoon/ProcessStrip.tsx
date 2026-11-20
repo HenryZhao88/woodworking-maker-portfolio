@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
+import { Rich } from "@/components/Rich";
 import { gsap, ScrollTrigger, useGSAP, exposePin } from "@/lib/gsap";
 import type { Project } from "@/content/types";
 import styles from "./ProcessStrip.module.css";
@@ -116,7 +117,9 @@ export function ProcessStrip({ process }: { process: Process }) {
         <RevealText as="h2" split="words" className={styles.h} id="process-h">
           {process.heading}
         </RevealText>
-        <RevealText className={styles.intro}>{process.intro}</RevealText>
+        <RevealText className={styles.intro}>
+          <Rich text={process.intro} />
+        </RevealText>
       </header>
 
       <div className={styles.pin} data-process>
@@ -134,9 +137,13 @@ export function ProcessStrip({ process }: { process: Process }) {
           {process.stages.map((stage, si) => (
             <div key={stage.label} className={styles.stage} data-stage>
               <div className={styles.stageHead}>
-                <span className={styles.stageNum}>{String(si + 1).padStart(2, "0")}</span>
+                <span className={styles.stageNum}>
+                  {String(si + 1).padStart(2, "0")} <span className={styles.when}>· {stage.when}</span>
+                </span>
                 <h3 className={styles.stageLabel}>{stage.label}</h3>
-                <p className={styles.stageCaption}>{stage.caption}</p>
+                <p className={styles.stageCaption}>
+                  <Rich text={stage.caption} />
+                </p>
               </div>
               {stage.images.map((img, ii) => {
                 const n = stageStart[si] + ii + 1;

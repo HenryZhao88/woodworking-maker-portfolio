@@ -80,6 +80,21 @@ img {
   color: var(--bg);
 }
 
+/* Highlighted phrase inside body copy: the accent voice, in gold. */
+.mark {
+  font-family: var(--font-accent), Georgia, serif;
+  font-style: italic;
+  font-size: 1.08em;
+  letter-spacing: -0.01em;
+  color: var(--gold);
+}
+
+/* Reveal masks get room below the baseline so descenders (g, p, y) are never clipped. */
+.rt-line-mask {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
 .eyebrow {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 12px;

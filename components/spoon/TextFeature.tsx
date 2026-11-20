@@ -1,7 +1,8 @@
 "use client";
-import { useRef, type CSSProperties } from "react";
+import { Fragment, useRef, type CSSProperties } from "react";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
+import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import type { ProjectImage } from "@/content/types";
 import styles from "./TextFeature.module.css";
@@ -10,6 +11,7 @@ type Props = {
   eyebrow: string;
   heading: string;
   body: string[];
+  quote?: string;
   image: ProjectImage;
   /** "grain": photo revealed board-by-board (WebGL wood-grain dissolve in phase 2). "wipe": diagonal clip wipe with parallax. */
   variant: "grain" | "wipe";
@@ -20,7 +22,7 @@ const SLATS = 9;
 // Server render starts fully revealed; the client tween rewinds it to 0 before first paint of the section.
 const INITIAL_REVEAL = 1;
 
-export function TextFeature({ eyebrow, heading, body, image, variant, id }: Props) {
+export function TextFeature({ eyebrow, heading, body, quote, image, variant, id }: Props) {
   const root = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -65,9 +67,18 @@ export function TextFeature({ eyebrow, heading, body, image, variant, id }: Prop
         </div>
         <div className={styles.copy}>
           {body.map((t, i) => (
-            <RevealText key={i} className={styles.p}>
-              {t}
-            </RevealText>
+            <Fragment key={i}>
+              <RevealText className={styles.p}>
+                <Rich text={t} />
+              </RevealText>
+              {quote && i === 0 && (
+                <blockquote className={styles.quote}>
+                  <RevealText as="p" split="words">
+                    {quote}
+                  </RevealText>
+                </blockquote>
+              )}
+            </Fragment>
           ))}
         </div>
       </div>

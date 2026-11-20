@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
+import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import type { Project } from "@/content/types";
 import styles from "./About.module.css";
@@ -41,8 +42,8 @@ export function About({ about }: { about: NonNullable<Project["about"]> }) {
           {about.heading}
         </RevealText>
         {about.body.map((t, i) => (
-          <RevealText key={i} className={styles.p}>
-            {t}
+          <RevealText key={i} className={i === 0 ? styles.lede : styles.p}>
+            <Rich text={t} />
           </RevealText>
         ))}
       </div>

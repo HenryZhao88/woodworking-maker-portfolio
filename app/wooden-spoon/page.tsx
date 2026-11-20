@@ -13,13 +13,14 @@ import { DetailDive } from "@/components/spoon/DetailDive";
 export const metadata: Metadata = { title: "Wooden Spoon" };
 
 function allImages(p: Project): ProjectImage[] {
-  return [
+  const all = [
     ...(p.about ? [p.about.image] : []),
     ...(p.process?.stages.flatMap((s) => s.images) ?? []),
     ...(p.favorite ? [p.favorite.image] : []),
     ...(p.challenging ? [p.challenging.image] : []),
     ...(p.finished ? [...p.finished.overall, ...p.finished.details] : []),
   ];
+  return all.filter((img, i) => all.findIndex((o) => o.src === img.src) === i); // a photo may serve two sections
 }
 
 export default function WoodenSpoon() {

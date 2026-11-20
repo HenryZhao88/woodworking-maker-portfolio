@@ -12,13 +12,18 @@ export interface ProjectImage {
 
 export interface ProcessStage {
   label: string;
+  /** When it happened (from the photo dates), e.g. "Oct 14 to 20". */
+  when: string;
   caption: string;
   images: ProjectImage[];
 }
 
 export interface TextBlock {
   heading: string;
+  /** Paragraphs. Wrap a phrase in *asterisks* to set it in the gold italic accent. */
   body: string[];
+  /** Optional pull quote, shown large between paragraphs. */
+  quote?: string;
 }
 
 export interface Project {
