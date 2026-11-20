@@ -16,7 +16,7 @@ type Process = NonNullable<Project["process"]>;
 export function ProcessStrip({ process }: { process: Process }) {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
-  let n = 0;
+  const stageStart = process.stages.map((_, i) => process.stages.slice(0, i).reduce((a, st) => a + st.images.length, 0));
 
   useGSAP(
     () => {
@@ -124,8 +124,8 @@ export function ProcessStrip({ process }: { process: Process }) {
                 <h3 className={styles.stageLabel}>{stage.label}</h3>
                 <p className={styles.stageCaption}>{stage.caption}</p>
               </div>
-              {stage.images.map((img) => {
-                n += 1;
+              {stage.images.map((img, ii) => {
+                const n = stageStart[si] + ii + 1;
                 return (
                   <div key={img.src} className={styles.card} data-card style={{ ["--ar" as string]: img.width / img.height }}>
                     <Photo image={img} sizes="(max-width: 767px) 88vw, 40vw" />

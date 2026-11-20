@@ -20,6 +20,8 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const tick = (time: number) => instance.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
+    // Publishing an external instance created in this effect is the intended use here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLenis(instance);
     (window as unknown as { __lenis?: Lenis }).__lenis = instance;
     return () => {
