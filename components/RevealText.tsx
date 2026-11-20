@@ -36,6 +36,8 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
         type: split === "chars" ? "lines,words,chars" : split === "words" ? "lines,words" : "lines",
         mask: "lines",
         autoSplit: true,
+        // Words/lines stay readable as-is; letter splits are aria-hidden and a screen-reader copy carries the text.
+        aria: split === "chars" ? "hidden" : "none",
         onSplit(self) {
           const targets = split === "chars" ? self.chars : split === "words" ? self.words : self.lines;
           // Entrance animations wait for the loader to hand off.
@@ -60,9 +62,16 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
     { scope: ref }
   );
 
-  return (
-    <Tag ref={ref} className={className} style={{ visibility: "hidden" }} {...rest}>
+  const el = (
+    <Tag ref={ref} className={className} style={{ visibility: "hidden" }} aria-hidden={split === "chars" ? true : undefined} {...rest}>
       {children}
     </Tag>
+  );
+  if (split !== "chars") return el;
+  return (
+    <>
+      {el}
+      <span className="sr-only">{children}</span>
+    </>
   );
 }

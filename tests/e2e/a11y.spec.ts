@@ -50,3 +50,12 @@ test("photos are labelled buttons for assistive tech", async ({ page }) => {
   const unlabeled = await page.locator("main [data-photo]").evaluateAll((els) => els.filter((e) => !e.getAttribute("aria-label")?.startsWith("View full size")).length);
   expect(unlabeled).toBe(0);
 });
+
+test("headings keep clean accessible names after letter-splitting", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1, name: "Maker Portfolio" })).toBeVisible();
+  await page.goto("/wooden-spoon");
+  await expect(page.getByRole("heading", { level: 1, name: "Wooden Spoon" })).toBeVisible();
+  const badAria = await page.locator("main p[aria-label], main span[aria-label]").count();
+  expect(badAria).toBe(0);
+});
