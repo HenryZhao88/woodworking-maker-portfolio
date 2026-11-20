@@ -117,3 +117,17 @@ test("spoon title keeps its accessible name with the space", async ({ page }) =>
   await page.goto("/wooden-spoon");
   await expect(page.getByRole("heading", { level: 1, name: "Wooden Spoon", exact: true })).toBeVisible();
 });
+
+test("'Scroll to begin' sits clear of the descender in 'Spoon'", async ({ page }) => {
+  await page.goto("/wooden-spoon");
+  await page.waitForTimeout(2500);
+  const gap = await page.evaluate(() => {
+    const h1 = document.querySelector<HTMLElement>('h1[data-flip-id="page-title"]')!;
+    const fs = parseFloat(getComputedStyle(h1).fontSize);
+    // The "p" descender hangs about 0.2em below the last line box (line-height is under 1).
+    const lastLine = [...h1.querySelectorAll<HTMLElement>("span")].filter((s) => s.offsetHeight).pop()!.getBoundingClientRect();
+    const foot = h1.nextElementSibling!.getBoundingClientRect();
+    return (foot.top - lastLine.bottom) / fs;
+  });
+  expect(gap).toBeGreaterThan(0.2);
+});
