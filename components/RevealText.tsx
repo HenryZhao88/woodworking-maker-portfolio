@@ -1,6 +1,7 @@
 "use client";
 import { useRef, type ElementType, type ReactNode } from "react";
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { isMorphTarget } from "@/components/transitions/RouteTransition";
 
 type Props = {
   as?: ElementType;
@@ -21,6 +22,11 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
     () => {
       const el = ref.current;
       if (!el) return;
+      if (isMorphTarget(el)) {
+        // A page-transition ghost is landing on this element: show it as-is.
+        gsap.set(el, { autoAlpha: 1 });
+        return;
+      }
       if (prefersReducedMotion()) {
         gsap.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8, delay, scrollTrigger: trigger === "scroll" ? { trigger: el, start: "top 88%" } : undefined });
         return;
