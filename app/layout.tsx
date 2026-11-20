@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Nav } from "@/components/Nav";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -22,7 +24,12 @@ export const viewport: Viewport = { themeColor: "#0e0b08" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <SmoothScroll>
+          <Nav />
+          {children}
+        </SmoothScroll>
+      </body>
     </html>
   );
 }
