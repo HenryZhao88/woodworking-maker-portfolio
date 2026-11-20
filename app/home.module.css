@@ -60,10 +60,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  letter-spacing: -0.005em;
   color: var(--muted);
 }
 .cueLine {
@@ -93,10 +92,9 @@
   padding: 18px 28px;
   border: 1px solid var(--gold);
   border-radius: 999px;
-  font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  letter-spacing: -0.005em;
   color: var(--gold);
   transition: background 0.5s var(--ease-out), color 0.5s var(--ease-out);
 }

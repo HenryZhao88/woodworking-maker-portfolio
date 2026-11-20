@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -36,7 +35,6 @@ const boska = localFont({
   display: "swap",
   src: [{ path: "./fonts/boska-500.woff2", weight: "500" }],
 });
-const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: { default: "Maker Portfolio · Henry Zhao", template: "%s · Maker Portfolio" },
@@ -47,7 +45,7 @@ export const viewport: Viewport = { themeColor: "#0e0b08" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${boska.variable} ${mono.variable}`}>
+    <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${boska.variable}`}>
       <body>
         <SmoothScroll>
           <QualityGate />

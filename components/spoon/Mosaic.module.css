@@ -6,7 +6,7 @@
 .tile { break-inside: avoid; margin-bottom: 14px; transform-style: preserve-3d; }
 .end { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14vh; }
 .rule { width: 60px; height: 3px; background: var(--gold); }
-.back { font-family: var(--font-mono), monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
+.back { font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums; font-size: 14px; letter-spacing: -0.005em;  }
 .back:hover { color: var(--gold); }
 @media (max-width: 700px) {
   .grid { columns: 2; column-gap: 10px; }

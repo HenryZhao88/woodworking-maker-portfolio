@@ -12,10 +12,9 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  letter-spacing: -0.005em;
   color: var(--muted);
 }
 .name { font-family: var(--font-accent), serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 20px; color: var(--fg); }

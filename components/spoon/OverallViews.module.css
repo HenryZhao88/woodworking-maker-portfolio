@@ -10,14 +10,13 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  font-family: var(--font-mono), monospace;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
   z-index: 5;
 }
 .counter [data-counter] { font-family: var(--font-numeral), Georgia, serif; font-style: normal; font-weight: 500; font-size: clamp(52px, 6.4vw, 104px); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--gold); }
 .of { color: var(--muted); font-size: 13px; }
-.label { font-size: 11px; color: var(--muted); margin-left: 12px; }
+.label { font-size: 14px; color: var(--muted); margin-left: 12px; }
 @media (max-width: 767px) {
   .copy { top: calc(var(--nav-h) + 8px); }
 }

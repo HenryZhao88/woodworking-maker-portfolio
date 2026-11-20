@@ -17,7 +17,7 @@
 .stage { display: flex; align-items: center; gap: 2.2vw; transform-style: preserve-3d; }
 .stageHead { width: 260px; flex: none; display: flex; flex-direction: column; gap: 14px; align-self: center; }
 .when { color: var(--muted); }
-.stageNum { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--gold); letter-spacing: 0.2em; }
+.stageNum { font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums; font-size: 14px; color: var(--gold); letter-spacing: -0.005em; }
 .stageLabel { font-family: var(--font-numeral), Georgia, serif; font-style: normal; font-weight: 500; letter-spacing: -0.02em; font-size: clamp(36px, 3.4vw, 60px); line-height: 1; }
 .stageCaption { color: var(--muted); font-size: 15px; }
 .card {
@@ -29,7 +29,7 @@
   will-change: transform;
 }
 .card > figure { height: 100%; }
-.cardNum { position: absolute; left: 0; bottom: -28px; font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.2em; }
+.cardNum { position: absolute; left: 0; bottom: -28px; font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--muted); letter-spacing: -0.005em; }
 
 .rail {
   position: absolute;
@@ -40,10 +40,10 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  font-family: var(--font-mono), monospace;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  
 }
 .railIndex { color: var(--muted); }
 .railLabel { color: var(--gold); min-width: 20ch; }
