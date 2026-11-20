@@ -171,6 +171,7 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
       if (!nextMain) {
         [holdLabel, holdHero, holdLogo].forEach((g) => g?.remove());
         if (logo) gsap.set(logo, { clearProps: "opacity" });
+        gsap.set([main, heroTitle].filter(Boolean), { clearProps: "opacity,transform" });
         morphTargets.clear();
         busy.current = false;
         return;
@@ -203,6 +204,8 @@ export function RouteTransitionProvider({ children }: { children: ReactNode }) {
       ghosts.forEach((g) => g.remove());
       if (logo) gsap.set(logo, { clearProps: "opacity" });
       gsap.set(nextMain, { clearProps: "opacity,transform" });
+      // Restore the outgoing page too, in case the router keeps it mounted for back/forward.
+      gsap.set([main, heroTitle].filter(Boolean), { clearProps: "opacity,transform" });
       morphTargets.clear();
       busy.current = false;
     },

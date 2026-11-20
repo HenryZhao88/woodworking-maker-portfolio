@@ -28,8 +28,8 @@ test("loader waits for spoon photos to be decoded before finishing", async ({ pa
 });
 
 test("a never-loading image cannot hang the loader past the hard cap", async ({ page }) => {
-  await page.route("**/process-07*", () => {}); // never respond
-  await page.goto("/wooden-spoon");
+  await page.route(/process-07/, () => {}); // never respond (so the window "load" event never fires either)
+  await page.goto("/wooden-spoon", { waitUntil: "commit" });
   await page.waitForSelector("html[data-loader-done]", { state: "attached", timeout: 17000 });
 });
 

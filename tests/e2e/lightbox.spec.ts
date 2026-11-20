@@ -48,6 +48,8 @@ test("page scroll is locked while open", async ({ page }) => {
 test("clicking the visible overall view opens that view", async ({ page }) => {
   await page.goto("/wooden-spoon");
   await scrollPin(page, "[data-overall]", 0.5);
+  await expect(page.locator("[data-overall]")).toHaveAttribute("data-overall-active", "2");
+  await page.waitForTimeout(800); // let the scrubbed crossfade settle
   await page.mouse.click(720, 450);
   await expect(page.getByRole("dialog").locator("img")).toHaveAttribute("src", /overall-2\.jpg$/);
 });

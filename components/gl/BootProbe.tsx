@@ -20,7 +20,7 @@ export function BootProbe() {
   useFrame((_, delta) => {
     if (phase.current === "textures") {
       const all = document.querySelectorAll("main [data-photo][data-gl]").length;
-      const ready = document.querySelectorAll("main [data-photo][data-gl][data-gl-ready]").length;
+      const ready = document.querySelectorAll("main [data-photo][data-gl][data-gl-ready], main [data-photo][data-gl][data-gl-failed]").length;
       if (ready >= all) {
         gl.compile(scene, camera); // compile the plane materials too
         markBoot("gl");

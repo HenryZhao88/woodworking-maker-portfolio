@@ -8,6 +8,7 @@ import { useScene } from "./sceneStore";
 import { PlaneLayer } from "./PlaneLayer";
 import { HomeBackground } from "./HomeBackground";
 import { BootProbe } from "./BootProbe";
+import { GLErrorBoundary } from "./GLErrorBoundary";
 import styles from "./SceneCanvas.module.css";
 
 /**
@@ -38,6 +39,7 @@ export function SceneCanvas() {
 
   return (
     <div className={styles.wrap} aria-hidden>
+      <GLErrorBoundary onError={() => setTier("fallback")}>
       <Canvas
         frameloop="never"
         dpr={[1, settings.dprMax]}
@@ -56,6 +58,7 @@ export function SceneCanvas() {
         <PlaneLayer velocity={velocity} />
         <BootProbe />
       </Canvas>
+      </GLErrorBoundary>
     </div>
   );
 }

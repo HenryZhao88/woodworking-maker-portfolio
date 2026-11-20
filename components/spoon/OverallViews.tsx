@@ -28,6 +28,7 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
         scrollTrigger: {
           trigger: pin,
           pin: true,
+          refreshPriority: 5,
           start: "top top",
           end: () => `+=${window.innerHeight * 2.4}`,
           scrub: reduced ? true : 1,

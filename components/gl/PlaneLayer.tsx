@@ -4,6 +4,9 @@ import { usePathname } from "next/navigation";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { squareToQuad, type Quad } from "@/lib/homography";
+import { textureSize } from "@/lib/textureSize";
+import type { QualityTier } from "@/lib/quality";
+import { useScene } from "./sceneStore";
 import { planeFragment, planeVertex, PLANE_MODE } from "./shaders/plane";
 
 type Plane = {
@@ -17,7 +20,44 @@ type Plane = {
 };
 
 const GEO = new THREE.PlaneGeometry(1, 1, 24, 24);
-const loader = new THREE.TextureLoader();
+
+/** One GPU texture per photo src (the mosaic repeats every photo), size-capped per tier, ref-counted. */
+const cache = new Map<string, { tex: Promise<THREE.Texture>; refs: number }>();
+function acquireTexture(src: string, img: HTMLImageElement, tier: QualityTier): Promise<THREE.Texture> {
+  const hit = cache.get(src);
+  if (hit) {
+    hit.refs++;
+    return hit.tex;
+  }
+  const tex = new Promise<THREE.Texture>((resolve, reject) => {
+    const make = () => {
+      if (!img.naturalWidth) return reject(new Error(`image failed: ${src}`));
+      const [w, h] = textureSize(img.naturalWidth, img.naturalHeight, tier);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+      const t = new THREE.CanvasTexture(canvas);
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.minFilter = THREE.LinearFilter;
+      t.generateMipmaps = false;
+      resolve(t);
+    };
+    if (img.complete) make();
+    else {
+      img.addEventListener("load", make, { once: true });
+      img.addEventListener("error", () => reject(new Error(`image failed: ${src}`)), { once: true });
+    }
+  });
+  cache.set(src, { tex, refs: 1 });
+  return tex;
+}
+function releaseTexture(src: string) {
+  const hit = cache.get(src);
+  if (!hit || --hit.refs > 0) return;
+  cache.delete(src);
+  hit.tex.then((t) => t.dispose()).catch(() => undefined);
+}
 
 function modeFor(fig: HTMLElement): number {
   const effect = fig.closest<HTMLElement>("[data-gl-effect]")?.dataset.glEffect;
@@ -44,6 +84,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
   const group = useMemo(() => new THREE.Group(), []);
   const planes = useRef<Map<HTMLElement, Plane>>(new Map());
   const pathname = usePathname();
+  const tier = useScene((s) => s.tier) ?? "full";
 
   useEffect(() => {
     scene.add(group);
@@ -98,19 +139,14 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       group.add(mesh);
       io.observe(fig);
 
-      const load = () => {
-        const url = img.currentSrc || img.src;
-        loader.load(url, (tex) => {
-          if (plane.disposed) return tex.dispose();
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.minFilter = THREE.LinearFilter;
-          tex.generateMipmaps = false;
+      const src = fig.dataset.src ?? img.src;
+      acquireTexture(src, img, tier)
+        .then((tex) => {
+          if (plane.disposed) return;
           material.uniforms.uTex.value = tex;
           fig.setAttribute("data-gl-ready", "");
-        });
-      };
-      if (img.complete && img.naturalWidth) load();
-      else img.addEventListener("load", load, { once: true });
+        })
+        .catch(() => fig.setAttribute("data-gl-failed", "")); // the DOM image stays; boot doesn't wait on it
     };
 
     const remove = (fig: HTMLElement) => {
@@ -119,7 +155,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       p.disposed = true;
       io.unobserve(fig);
       group.remove(p.mesh);
-      p.mesh.material.uniforms.uTex.value?.dispose();
+      releaseTexture(fig.dataset.src ?? "");
       p.mesh.material.dispose();
       fig.removeAttribute("data-gl-ready");
       map.delete(fig);
@@ -139,7 +175,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       io.disconnect();
       [...map.keys()].forEach(remove);
     };
-  }, [group, pathname]);
+  }, [group, pathname, tier]);
 
   useFrame((state) => {
     const W = window.innerWidth;

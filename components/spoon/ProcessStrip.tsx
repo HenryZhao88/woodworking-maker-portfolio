@@ -51,6 +51,7 @@ export function ProcessStrip({ process }: { process: Process }) {
           scrollTrigger: {
             trigger: pin,
             pin: true,
+            refreshPriority: 10, // measure before every later section, which sit below its pin spacer
             start: "top top",
             end: () => `+=${distance()}`,
             scrub: 0.8,
@@ -83,6 +84,9 @@ export function ProcessStrip({ process }: { process: Process }) {
           skewTo(gsap.utils.clamp(-6, 6, -v / 9));
         };
         gsap.ticker.add(skewTick);
+        // Re-created after a breakpoint change: re-sort so later triggers re-measure below the new spacer.
+        ScrollTrigger.sort();
+        requestAnimationFrame(() => ScrollTrigger.refresh());
         return () => {
           gsap.ticker.remove(skewTick);
           gsap.set(cards, { clearProps: "transform" });

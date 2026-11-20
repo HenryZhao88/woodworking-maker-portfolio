@@ -82,7 +82,8 @@ export function Loader() {
       return sleep(Math.max(0, min - (performance.now() - t0)));
     });
     let cancelled = false;
-    Promise.race([readyThenMin, sleep(LOADER_HARD_CAP_MS)]).then(() => {
+    // The cap counts from navigation start (performance.now() is relative to it), not from hydration.
+    Promise.race([readyThenMin, sleep(Math.max(0, LOADER_HARD_CAP_MS - performance.now()))]).then(() => {
       if (cancelled) return;
       cancelAnimationFrame(raf);
       if (pctRef.current) pctRef.current.textContent = "100";

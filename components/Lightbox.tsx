@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { gsap, Flip, prefersReducedMotion } from "@/lib/gsap";
 import { useLenis } from "@/components/SmoothScroll";
 import type { ProjectImage } from "@/content/types";
@@ -35,6 +36,13 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   const originRef = useRef<HTMLElement | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const closing = useRef(false);
+  const pathname = usePathname();
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  // A route change (e.g. the Back button) closes the lightbox.
+  if (index !== null && openPath !== null && openPath !== pathname) {
+    setIndex(null);
+    setOpenPath(null);
+  }
 
   const open = useCallback((img: ProjectImage, originEl: HTMLElement) => {
     const list = collect();
@@ -42,6 +50,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     originRef.current = originEl;
     setItems(list);
     setIndex(i);
+    setOpenPath(window.location.pathname);
   }, []);
 
   const close = useCallback(() => {
@@ -50,6 +59,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     const finish = () => {
       closing.current = false;
       setIndex(null);
+      document.querySelectorAll<HTMLElement>("main, header").forEach((el) => (el.inert = false)); // before refocusing
       origin?.focus({ preventScroll: true });
     };
     if (prefersReducedMotion() || !imgRef.current || !origin) return finish();
@@ -93,13 +103,27 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     const block = (e: Event) => e.preventDefault();
     window.addEventListener("wheel", block, { passive: false });
     window.addEventListener("touchmove", block, { passive: false });
+    // Modal: everything behind the dialog is inert; Tab cycles inside it.
+    const behind = [...document.querySelectorAll<HTMLElement>("main, header")];
+    behind.forEach((el) => (el.inert = true));
+    const dialog = document.querySelector<HTMLElement>("[role=dialog]");
+    dialog?.focus();
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab" && dialog) {
+        const f = [...dialog.querySelectorAll<HTMLElement>("button")];
+        if (!f.length) return;
+        const i = f.indexOf(document.activeElement as HTMLElement);
+        e.preventDefault();
+        f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+        return;
+      }
       if (e.key === "Escape") close();
       else if (e.key === "ArrowRight") setIndex((i) => (i === null ? i : (i + 1) % items.length));
       else if (e.key === "ArrowLeft") setIndex((i) => (i === null ? i : (i - 1 + items.length) % items.length));
     };
     window.addEventListener("keydown", onKey);
     return () => {
+      behind.forEach((el) => (el.inert = false));
       lenis?.start();
       html.style.overflow = prevOverflow;
       window.removeEventListener("wheel", block);

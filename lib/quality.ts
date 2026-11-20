@@ -23,8 +23,10 @@ export function tierSettings(t: QualityTier): { dprMax: number; particles: numbe
 
 export function hasWebGL(): boolean {
   try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+    // three.js r163+ requires WebGL2; WebGL1-only devices take the DOM fallback.
+    const gl = document.createElement("canvas").getContext("webgl2");
+    gl?.getExtension("WEBGL_lose_context")?.loseContext(); // release the probe context
+    return !!gl;
   } catch {
     return false;
   }
