@@ -14,6 +14,7 @@ type Plane = {
   corners: HTMLElement[];
   fadeEl: HTMLElement | null;
   progressEl: HTMLElement | null;
+  clipEl: HTMLElement | null;
   mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   visible: boolean;
   disposed: boolean;
@@ -66,6 +67,17 @@ function modeFor(fig: HTMLElement): number {
   if (effect === "displace") return PLANE_MODE.displace;
   return PLANE_MODE.generic;
 }
+
+/** Nearest ancestor that clips its overflow: the plane must be cut off where the DOM photo would be. */
+function clipAncestor(fig: HTMLElement): HTMLElement | null {
+  for (let el = fig.parentElement; el && el !== document.body; el = el.parentElement) {
+    const cs = getComputedStyle(el);
+    if (/(hidden|clip)/.test(cs.overflow + cs.overflowX + cs.overflowY)) return el;
+  }
+  return null;
+}
+
+const NO_CLIP = new THREE.Vector4(-1e6, -1e6, 1e6, 1e6);
 
 function readOpacity(el: HTMLElement | null): number {
   if (!el) return 1;
@@ -121,6 +133,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
           uMode: { value: modeFor(fig) },
           uProgress: { value: 1 },
           uTime: { value: 0 },
+          uClip: { value: NO_CLIP.clone() },
         },
       });
       const mesh = new THREE.Mesh(GEO, material);
@@ -131,6 +144,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
         corners: [0, 1, 2, 3].map((i) => fig.querySelector<HTMLElement>(`[data-c="${i}"]`)!),
         fadeEl: fig.closest<HTMLElement>("[data-gl-fade]"),
         progressEl: fig.closest<HTMLElement>("[data-gl-progress]"),
+        clipEl: clipAncestor(fig),
         mesh,
         visible: false,
         disposed: false,
@@ -182,6 +196,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
     const H = window.innerHeight;
     const vel = velocity.current;
     const t = state.clock.elapsedTime;
+    const dpr = state.gl.getPixelRatio();
     planes.current.forEach((p) => {
       const u = p.mesh.material.uniforms;
       const alpha = readOpacity(p.fadeEl);
@@ -199,6 +214,11 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       u.uAlpha.value = alpha;
       u.uVel.value = vel;
       u.uTime.value = t;
+      const clip = u.uClip.value as THREE.Vector4;
+      if (p.clipEl) {
+        const c = p.clipEl.getBoundingClientRect(); // framebuffer y runs bottom-up
+        clip.set(c.left * dpr, (H - c.bottom) * dpr, c.right * dpr, (H - c.top) * dpr);
+      } else clip.copy(NO_CLIP);
       if (p.progressEl) u.uProgress.value = Number(p.progressEl.style.getPropertyValue("--p") || 0);
       p.mesh.visible = true;
     });

@@ -2,7 +2,7 @@
  * ALL portfolio content lives here.
  *
  * To add your real photos:
- *   1. Put them in /public/projects/wooden-spoon/ (any filename).
+ *   1. Put them in /public/projects/wooden-spoon/ as JPG/PNG/WebP (not HEIC), exact filename case.
  *   2. Update `src`, `alt`, `width`, `height` below (width/height = the photo's real pixel size).
  *   3. Run `npm test` — it checks the teacher's rubric (≥12 process, 3 overall, 3 details, all sections).
  *
@@ -12,16 +12,16 @@ import type { Project, ProjectImage } from "./types";
 
 const DIR = "/projects/wooden-spoon";
 
-const P = (n: number, portrait: boolean, alt: string): ProjectImage => ({
+// Every photo was shot on a phone; all but two are portrait. Sizes are the real pixel sizes of the files.
+const PORTRAIT = { width: 1800, height: 2400 };
+const LANDSCAPE = { width: 2400, height: 1800 };
+
+const proc = (n: number, alt: string, size = PORTRAIT): ProjectImage => ({
   src: `${DIR}/process-${String(n).padStart(2, "0")}.jpg`,
   alt,
   role: "process",
-  width: portrait ? 1200 : 1600,
-  height: portrait ? 1600 : 1200,
+  ...size,
 });
-
-// Placeholder images: every 3rd process photo is landscape, others portrait (mirrors a real phone camera roll).
-const proc = (n: number, alt: string) => P(n, n % 3 !== 0, alt);
 
 export const projects: Project[] = [
   {
@@ -35,36 +35,52 @@ export const projects: Project[] = [
         "[Placeholder] Introduce the project for someone who has never seen it: what you made, what wood you used, how long it took, and what the goal was.",
         "[Placeholder] Mention the main tools — saws, rasps, gouges, files, sandpaper — and anything new you learned to use.",
       ],
-      image: { src: `${DIR}/about.jpg`, alt: "[Placeholder] The finished wooden spoon", role: "feature", width: 1600, height: 1100 },
+      image: { src: `${DIR}/about.jpg`, alt: "The back of the finished cherry spoon's bowl, curving into the handle", role: "feature", ...PORTRAIT },
     },
     process: {
       heading: "From board to bowl.",
       intro: "[Placeholder] One or two sentences framing the process — the path from a rough blank to a finished spoon.",
       stages: [
         {
-          label: "Blank & Layout",
-          caption: "[Placeholder] Choosing the wood and drawing the spoon's outline onto the blank.",
-          images: [proc(1, "[Placeholder] Selecting the board"), proc(2, "[Placeholder] Tracing the template"), proc(3, "[Placeholder] Marked-out blank")],
-        },
-        {
-          label: "Rough Shaping",
-          caption: "[Placeholder] Cutting out the profile and removing the bulk of the waste.",
-          images: [proc(4, "[Placeholder] Cutting the outline"), proc(5, "[Placeholder] Rough profile"), proc(6, "[Placeholder] Side profile cut")],
+          label: "Layout & Drilling",
+          caption: "[Placeholder] Drawing the spoon's top and side views on grid paper, gluing them to the block, and drilling out the start of the bowl.",
+          images: [
+            proc(1, "Grid-paper drawings of the spoon's top and side views glued onto a block of wood", LANDSCAPE),
+            proc(2, "A round hole drilled into the bowl area with the drill press"),
+          ],
         },
         {
           label: "Carving the Bowl",
-          caption: "[Placeholder] Hollowing the bowl with gouges and checking the depth.",
-          images: [proc(7, "[Placeholder] Starting the bowl"), proc(8, "[Placeholder] Gouge work"), proc(9, "[Placeholder] Checking depth")],
+          caption: "[Placeholder] Hollowing the bowl with a gouge and mallet, then smoothing it with a Dremel.",
+          images: [
+            proc(3, "Carving the bowl with a gouge and a wooden mallet"),
+            proc(4, "The bowl fully hollowed after gouging and Dremel work"),
+          ],
         },
         {
-          label: "Refining & Sanding",
-          caption: "[Placeholder] Rasping the curves smooth and working through the sandpaper grits.",
-          images: [proc(10, "[Placeholder] Rasping the handle"), proc(11, "[Placeholder] Sanding the bowl")],
+          label: "Band Saw Cuts",
+          caption: "[Placeholder] Cutting the side profile on the band saw with Ms. Bernstein, sanding it flat, then cutting the top-down outline.",
+          images: [
+            proc(5, "Ms. Bernstein cutting the spoon's side profile on the band saw"),
+            proc(6, "Finishing the side-profile cut on the band saw"),
+            proc(7, "Sanding the blank flat on the belt sander after the side cut"),
+            proc(8, "Hand sanding the inside of the bowl with folded sandpaper"),
+            proc(9, "Ms. Bernstein cutting the spoon's top-down outline on the band saw"),
+          ],
+        },
+        {
+          label: "Shaping & Sanding",
+          caption: "[Placeholder] Sanding the whole spoon into its final shape on the belt and spindle sanders, then by hand.",
+          images: [
+            proc(10, "Sanding the spoon on the belt sander"),
+            proc(11, "Smoothing the handle's inside curves on the spindle sander"),
+            proc(12, "Hand sanding the whole spoon with a sanding block"),
+          ],
         },
         {
           label: "Finishing",
-          caption: "[Placeholder] Applying a food-safe finish to bring out the grain.",
-          images: [proc(12, "[Placeholder] Applying finish"), proc(13, "[Placeholder] Drying")],
+          caption: "[Placeholder] Oiling the spoon to bring out the grain, letting it dry, and buffing it to a soft shine.",
+          images: [proc(13, "The oiled spoon drying on a paper towel")],
         },
       ],
     },
@@ -73,35 +89,26 @@ export const projects: Project[] = [
       body: [
         "[Placeholder] What was your favorite part of the project, and why? Describe the moment it clicked.",
       ],
-      image: { src: `${DIR}/favorite.jpg`, alt: "[Placeholder] Favorite step", role: "feature", width: 1200, height: 1500 },
+      image: { src: `${DIR}/favorite.jpg`, alt: "Close-up of the cherry grain swirling inside the finished bowl", role: "feature", ...PORTRAIT },
     },
     challenging: {
       heading: "The part that fought back.",
       body: [
         "[Placeholder] What was the most challenging aspect? What went wrong, and how did you solve or work around it?",
       ],
-      image: { src: `${DIR}/challenging.jpg`, alt: "[Placeholder] The hardest step", role: "feature", width: 1600, height: 1100 },
+      image: { src: `${DIR}/challenging.jpg`, alt: "The bowl after gouging and Dremel work, still inside the rectangular block", role: "feature", ...PORTRAIT },
     },
     finished: {
-      overall: [1, 2, 3].map((n) => ({
-        src: `${DIR}/overall-${n}.jpg`,
-        alt: `[Placeholder] Finished spoon, overall view ${n}`,
-        role: "overall" as const,
-        width: 1600,
-        height: 1200,
-      })),
+      overall: [
+        { src: `${DIR}/overall-1.jpg`, alt: "The finished cherry spoon from a three-quarter angle", role: "overall", ...LANDSCAPE },
+        { src: `${DIR}/overall-2.jpg`, alt: "The finished spoon from directly above, bowl at the bottom", role: "overall", ...PORTRAIT },
+        { src: `${DIR}/overall-3.jpg`, alt: "Looking down the length of the spoon from the flared end of the handle", role: "overall", ...PORTRAIT },
+      ],
       details: [
-        "where the bowl meets the handle",
-        "the curve of the bowl's rim",
-        "the plane change along the handle",
-      ].map((what, i) => ({
-        src: `${DIR}/detail-${i + 1}.jpg`,
-        alt: `[Placeholder] Detail: ${what}`,
-        role: "detail" as const,
-        width: 1200,
-        height: 1500,
-        caption: `[Placeholder] Detail — ${what}.`,
-      })),
+        { src: `${DIR}/detail-1.jpg`, alt: "Close-up of the crossbar, where the handle's flat planes step out and back", role: "detail", ...PORTRAIT, caption: "[Placeholder] Detail: the crossbar, where the handle's planes change." },
+        { src: `${DIR}/detail-2.jpg`, alt: "Close-up of the handle flaring out into a wide, curved end", role: "detail", ...PORTRAIT, caption: "[Placeholder] Detail: the curve of the flared handle end." },
+        { src: `${DIR}/detail-3.jpg`, alt: "Close-up of the bowl's rounded rim and side", role: "detail", ...PORTRAIT, caption: "[Placeholder] Detail: the curve of the bowl's rim." },
+      ],
     },
     impression: {
       heading: "Looking back.",

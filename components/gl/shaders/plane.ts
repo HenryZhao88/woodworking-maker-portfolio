@@ -29,9 +29,11 @@ uniform float uVel;
 uniform float uMode;
 uniform float uProgress;
 uniform float uTime;
+uniform vec4 uClip;      // visible region in framebuffer pixels (x0, y0, x1, y1), like the DOM's overflow clip
 varying vec2 vUv;
 ${NOISE}
 void main() {
+  if (gl_FragCoord.x < uClip.x || gl_FragCoord.y < uClip.y || gl_FragCoord.x > uClip.z || gl_FragCoord.y > uClip.w) discard;
   vec2 uv = vUv;
   float alpha = uAlpha;
 

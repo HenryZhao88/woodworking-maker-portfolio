@@ -6,7 +6,8 @@ const opacityOf = () => (s: string) => Number(getComputedStyle(document.querySel
 test("C1: home title is fully opaque after Home → Spoon → Back", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
-  await expect(page.locator("[data-morph-ghost]")).toHaveCount(0, { timeout: 5000 });
+  // The dev server resizes 22 full-size photos on first request, so the route can take ~4.5 s here (about 3.5 s in production).
+  await expect(page.locator("[data-morph-ghost]")).toHaveCount(0, { timeout: 8000 });
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
   await page.waitForTimeout(1500);

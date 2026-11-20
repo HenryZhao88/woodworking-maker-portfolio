@@ -3,6 +3,7 @@ import { getProject } from "../../content/projects";
 import { scrollPin } from "./helpers";
 
 const spoon = getProject("wooden-spoon")!;
+const stages = spoon.process!.stages;
 
 test("process heading present", async ({ page }) => {
   await page.goto("/wooden-spoon");
@@ -25,9 +26,9 @@ test("stage rail updates from first to last stage", async ({ page }) => {
   await page.goto("/wooden-spoon");
   const current = page.locator("[data-stage-current]");
   await scrollPin(page, "[data-process]", 0.02);
-  await expect(current).toHaveText("Blank & Layout");
+  await expect(current).toHaveText(stages[0].label);
   await scrollPin(page, "[data-process]", 0.99);
-  await expect(current).toHaveText("Finishing");
+  await expect(current).toHaveText(stages[stages.length - 1].label);
 });
 
 test("survives resize to phone mid-section without horizontal overflow", async ({ page }) => {

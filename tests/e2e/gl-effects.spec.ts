@@ -30,3 +30,36 @@ test("overall views and mosaic tiles expose fade sources for the planes", async 
   await expect(page.locator("[data-view][data-gl-fade]")).toHaveCount(3);
   expect(await page.locator("[data-tile][data-gl-fade]").count()).toBeGreaterThanOrEqual(19);
 });
+
+test("WebGL photos stay clipped to their section (the zoomed detail never bleeds into the next section)", async ({ page }) => {
+  const sharp = (await import("sharp")).default;
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/wooden-spoon");
+  const bottom = await page.locator('[data-gl-effect="dive"]').evaluate((el) => el.getBoundingClientRect().bottom + scrollY);
+  await scrollToY(page, Math.round(bottom - 900 * 0.45)); // section ends 45% down the screen
+  await page.waitForTimeout(1500);
+  // A strip in the next section, away from its centered text.
+  const png = await page.screenshot({ clip: { x: 1200, y: 650, width: 200, height: 200 } });
+  const { channels } = await sharp(png).stats();
+  const mean = (channels[0].mean + channels[1].mean + channels[2].mean) / 3;
+  expect(mean, "next section background should stay dark walnut").toBeLessThan(60);
+});
+
+test("detail captions sit on a dark backdrop even when the photo behind them is light", async ({ page }) => {
+  const sharp = (await import("sharp")).default;
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/wooden-spoon");
+  const block = page.locator("[data-dive]").first();
+  const top = await block.evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  const h = await block.evaluate((el) => (el as HTMLElement).offsetHeight);
+  await scrollToY(page, Math.round(top + h - 900 * 1.15)); // fully zoomed, caption showing
+  await page.waitForTimeout(1500);
+  const cap = block.locator("[data-dive-cap]");
+  await cap.evaluate((el) => ((el as HTMLElement).style.color = "transparent"));
+  await cap.evaluate((el) => ((el as HTMLElement).style.textShadow = "none"));
+  const box = (await cap.boundingBox())!;
+  const png = await page.screenshot({ clip: box });
+  const { channels } = await sharp(png).stats();
+  const mean = (channels[0].mean + channels[1].mean + channels[2].mean) / 3;
+  expect(mean, "backdrop behind the caption").toBeLessThan(75);
+});

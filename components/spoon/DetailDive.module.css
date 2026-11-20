@@ -3,6 +3,16 @@
 .sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; }
 .frame { position: relative; will-change: transform; }
 .tag { position: absolute; top: calc(var(--nav-h) + 3vh); left: var(--gutter); z-index: 2; }
+/* Keeps the caption readable over light photo backgrounds (the canvas sits under the DOM). */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  visibility: hidden;
+  background:
+    radial-gradient(120% 70% at 0% 100%, rgba(14, 11, 8, 0.92) 0%, rgba(14, 11, 8, 0.7) 35%, rgba(14, 11, 8, 0) 70%);
+}
 .cap {
   position: absolute;
   left: var(--gutter);
@@ -23,4 +33,5 @@
   .block { height: auto; }
   .sticky { position: relative; height: auto; padding: 12vh 0; }
   .cap { position: static; margin-top: 24px; }
+  .scrim { display: none; }
 }
