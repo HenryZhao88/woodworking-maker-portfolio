@@ -4,6 +4,11 @@
   overflow: hidden;
   background: var(--bg-2);
   border-radius: 2px;
+  cursor: zoom-in;
+}
+.frame:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
 }
 .img {
   width: 100%;

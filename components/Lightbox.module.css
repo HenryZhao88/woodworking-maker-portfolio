@@ -1,0 +1,38 @@
+.root { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; outline: none; }
+.backdrop { position: absolute; inset: 0; background: rgba(8, 6, 4, 0.94); backdrop-filter: blur(8px); }
+.img {
+  position: relative;
+  max-width: calc(100vw - 2 * var(--gutter));
+  max-height: calc(100svh - 140px);
+  width: auto;
+  height: calc(100svh - 140px);
+  object-fit: contain;
+  cursor: zoom-out;
+}
+.bar {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.alt { flex: 1; color: var(--fg); text-transform: none; letter-spacing: 0.02em; font-family: var(--font-body), sans-serif; font-size: 14px; }
+.controls { display: flex; gap: 8px; }
+.controls button {
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.controls button:hover { border-color: var(--gold); color: var(--gold); }
+@media (max-width: 640px) { .alt { display: none; } }

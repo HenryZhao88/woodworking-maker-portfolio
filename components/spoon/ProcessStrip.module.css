@@ -58,3 +58,6 @@
   .card { width: 100%; height: auto; }
   .card > figure { height: auto; }
 }
+/* 3D: cards sit behind their containers' z=0 plane, so containers must not capture hits. */
+.track, .stage { pointer-events: none; }
+.card, .stageHead { pointer-events: auto; }

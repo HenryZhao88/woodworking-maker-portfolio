@@ -33,6 +33,7 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
             if (pin.getAttribute("data-overall-active") !== String(n)) {
               pin.setAttribute("data-overall-active", String(n));
               counter.textContent = `0${n}`;
+              frames.forEach((f, i) => f.toggleAttribute("data-active", i === n - 1));
             }
           },
         },
@@ -61,7 +62,7 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
         </div>
         <div className={styles.stage} data-gl-effect="displace">
           {views.map((v, i) => (
-            <div key={v.src} className={styles.view} data-view style={{ zIndex: views.length - i }}>
+            <div key={v.src} className={styles.view} data-view data-active={i === 0 ? "" : undefined} style={{ zIndex: views.length - i }}>
               <Photo image={v} sizes="80vw" style={{ width: `min(76vw, calc(72svh * ${v.width / v.height}))` }} />
             </div>
           ))}

@@ -3,6 +3,7 @@ import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { LightboxProvider } from "@/components/Lightbox";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -26,8 +27,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
         <SmoothScroll>
-          <Nav />
-          {children}
+          <LightboxProvider>
+            <Nav />
+            {children}
+          </LightboxProvider>
         </SmoothScroll>
       </body>
     </html>

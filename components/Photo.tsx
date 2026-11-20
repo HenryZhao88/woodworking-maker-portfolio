@@ -21,6 +21,13 @@ export function Photo({ image, sizes, className, priority, style }: Props) {
       className={`${styles.frame} ${className ?? ""}`}
       style={{ aspectRatio: `${image.width} / ${image.height}`, ...style }}
       data-photo
+      data-src={image.src}
+      data-alt={image.alt}
+      data-w={image.width}
+      data-h={image.height}
+      role="button"
+      tabIndex={0}
+      aria-label={`View full size: ${image.alt}`}
     >
       <Image
         src={image.src}
@@ -32,6 +39,7 @@ export function Photo({ image, sizes, className, priority, style }: Props) {
         className={styles.img}
         data-w={image.width}
         data-h={image.height}
+        aria-hidden
         data-gl-src={image.src}
         draggable={false}
       />

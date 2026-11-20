@@ -21,3 +21,5 @@
 @media (max-width: 767px) {
   .copy { top: calc(var(--nav-h) + 8px); }
 }
+.view { pointer-events: none; }
+.view[data-active] figure { pointer-events: auto; }
