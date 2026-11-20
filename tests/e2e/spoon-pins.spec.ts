@@ -59,3 +59,19 @@ test("detail dive shows each detail caption", async ({ page }) => {
     await expect(page.getByText(d.caption!)).toHaveCount(1);
   }
 });
+
+test("strip skew settles back to zero after scrolling stops", async ({ page }) => {
+  await page.goto("/wooden-spoon");
+  await scrollPin(page, "[data-process]", 0.2);
+  const start = await page.evaluate(() => scrollY);
+  for (let i = 1; i <= 8; i++) {
+    await page.evaluate((y) => (window as any).__lenis.scrollTo(y, { immediate: true }), start + i * 220);
+    await page.waitForTimeout(40);
+  }
+  await page.waitForTimeout(2000);
+  const skew = await page.locator("[data-track]").evaluate((el) => {
+    const m = new DOMMatrix(getComputedStyle(el).transform);
+    return Math.abs(m.c);
+  });
+  expect(skew).toBeLessThan(0.01);
+});

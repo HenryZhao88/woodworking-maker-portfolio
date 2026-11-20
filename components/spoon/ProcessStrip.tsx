@@ -59,21 +59,32 @@ export function ProcessStrip({ process }: { process: Process }) {
             invalidateOnRefresh: true,
             onRefresh: (self) => exposePin(pin, self),
             onUpdate: (self) => {
-              const playhead = self.progress * distance() + self.progress * window.innerWidth;
+              // The stage under the viewport's center is "current"; the final stretch always shows the last one.
+              const playhead = self.progress * distance() + window.innerWidth / 2;
               let idx = 0;
               stages.forEach((s, i) => {
                 if (s.offsetLeft <= playhead) idx = i;
               });
+              if (self.progress >= 0.98) idx = stages.length - 1;
               setActive(idx);
               if (bar) bar.style.transform = `scaleX(${self.progress})`;
-              if (!reduced) skewTo(gsap.utils.clamp(-6, 6, self.getVelocity() / -400));
               arc();
             },
           },
         });
         exposePin(pin, tween.scrollTrigger as ScrollTrigger);
         arc();
+        // Skew follows live scroll velocity every frame, so it eases back to 0 when scrolling stops.
+        const skewTick = () => {
+          if (reduced) return;
+          const st = tween.scrollTrigger as ScrollTrigger;
+          if (!st.isActive) return skewTo(0);
+          const v = (window as unknown as { __lenis?: { velocity: number } }).__lenis?.velocity ?? 0;
+          skewTo(gsap.utils.clamp(-6, 6, -v / 9));
+        };
+        gsap.ticker.add(skewTick);
         return () => {
+          gsap.ticker.remove(skewTick);
           gsap.set(cards, { clearProps: "transform" });
           gsap.set(track, { clearProps: "transform" });
           pin.removeAttribute("data-pin-start");

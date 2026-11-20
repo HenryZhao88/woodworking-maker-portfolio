@@ -16,3 +16,16 @@
   object-fit: cover; /* frame aspect == image aspect, so nothing is cropped */
   user-select: none;
 }
+.c {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+/* When the WebGL layer has a plane for this photo, the DOM image steps aside (it stays in layout + a11y tree). */
+:global(html:not([data-quality="fallback"])) .frame[data-gl-ready] {
+  background: transparent;
+}
+:global(html:not([data-quality="fallback"])) .frame[data-gl-ready] .img {
+  opacity: 0;
+}

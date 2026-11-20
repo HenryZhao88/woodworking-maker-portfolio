@@ -18,7 +18,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const instance = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, touchMultiplier: 1.4 });
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => instance.raf(time * 1000);
-    gsap.ticker.add(tick);
+    gsap.ticker.add(tick, false, true); // first, so the scene renders after scroll updates
     gsap.ticker.lagSmoothing(0);
     // Publishing an external instance created in this effect is the intended use here.
     // eslint-disable-next-line react-hooks/set-state-in-effect

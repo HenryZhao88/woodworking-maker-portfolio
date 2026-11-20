@@ -4,6 +4,8 @@ import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { LightboxProvider } from "@/components/Lightbox";
+import { QualityGate } from "@/components/QualityGate";
+import { SceneCanvas } from "@/components/gl/SceneCanvas";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -27,6 +29,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
         <SmoothScroll>
+          <QualityGate />
+          <SceneCanvas />
           <LightboxProvider>
             <Nav />
             {children}
