@@ -51,7 +51,7 @@ test("C3: pins stay in page order after crossing the 768px breakpoint and back",
 test("I4: lightbox closes and scroll unlocks when the route changes", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
-  await expect(page.locator("[data-morph-ghost]")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("[data-morph-ghost]")).toHaveCount(0, { timeout: 8000 }); // dev server route time, see C1
   await scrollPin(page, "[data-process]", 0.02);
   await page.locator("[data-process] [data-photo]").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();

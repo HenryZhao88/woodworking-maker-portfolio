@@ -63,3 +63,36 @@ test("detail captions sit on a dark backdrop even when the photo behind them is 
   const mean = (channels[0].mean + channels[1].mean + channels[2].mean) / 3;
   expect(mean, "backdrop behind the caption").toBeLessThan(75);
 });
+
+test("page change builds photo textures off the main thread, one decode at a time (no stutter during the morph)", async ({ page }) => {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __dec: { active: number; max: number; total: number; draw2d: number } };
+    w.__dec = { active: 0, max: 0, total: 0, draw2d: 0 };
+    const orig = window.createImageBitmap.bind(window);
+    // @ts-expect-error test wrapper keeps the original signature
+    window.createImageBitmap = async (...args: Parameters<typeof createImageBitmap>) => {
+      w.__dec.active++;
+      w.__dec.total++;
+      w.__dec.max = Math.max(w.__dec.max, w.__dec.active);
+      try {
+        return await orig(...args);
+      } finally {
+        w.__dec.active--;
+      }
+    };
+    const draw = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (this: CanvasRenderingContext2D, ...a: unknown[]) {
+      if (a[0] instanceof HTMLImageElement && /projects/.test(a[0].currentSrc)) w.__dec.draw2d++;
+      // @ts-expect-error passthrough
+      return draw.apply(this, a);
+    } as typeof draw;
+  });
+  await page.goto("/");
+  await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
+  await expect(page.locator("[data-photo][data-gl-ready]").first()).toBeAttached({ timeout: 15000 });
+  await page.waitForTimeout(1500);
+  const d = await page.evaluate(() => (window as unknown as { __dec: { max: number; total: number; draw2d: number } }).__dec);
+  expect(d.total, "textures were built").toBeGreaterThan(0);
+  expect(d.max, "parallel decodes").toBe(1);
+  expect(d.draw2d, "photos resized on the main thread").toBe(0);
+});

@@ -7,6 +7,7 @@ import { squareToQuad, type Quad } from "@/lib/homography";
 import { textureSize } from "@/lib/textureSize";
 import type { QualityTier } from "@/lib/quality";
 import { useScene } from "./sceneStore";
+import { isBootDone } from "@/components/bootGate";
 import { planeFragment, planeVertex, PLANE_MODE } from "./shaders/plane";
 
 type Plane = {
@@ -30,34 +31,74 @@ function acquireTexture(src: string, img: HTMLImageElement, tier: QualityTier): 
     hit.refs++;
     return hit.tex;
   }
-  const tex = new Promise<THREE.Texture>((resolve, reject) => {
-    const make = () => {
-      if (!img.naturalWidth) return reject(new Error(`image failed: ${src}`));
-      const [w, h] = textureSize(img.naturalWidth, img.naturalHeight, tier);
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
-      const t = new THREE.CanvasTexture(canvas);
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.minFilter = THREE.LinearFilter;
-      t.generateMipmaps = false;
-      resolve(t);
-    };
-    if (img.complete) make();
-    else {
-      img.addEventListener("load", make, { once: true });
-      img.addEventListener("error", () => reject(new Error(`image failed: ${src}`)), { once: true });
-    }
-  });
-  cache.set(src, { tex, refs: 1 });
-  return tex;
+  const entry = { refs: 1 } as { tex: Promise<THREE.Texture>; refs: number };
+  // A queued decode whose photo was released meanwhile (e.g. the route re-synced) is skipped, not paid for.
+  const stillWanted = () => cache.get(src) === entry;
+  entry.tex = whenLoaded(img, src).then(() =>
+    queued(() => (stillWanted() ? buildTexture(img, tier) : Promise.reject(new Error(`released: ${src}`))))
+  );
+  cache.set(src, entry);
+  return entry.tex;
 }
+/**
+ * After the loader has handed off, photos decode one at a time: a burst of parallel decodes starves the
+ * browser's frame production and stutters page transitions. Behind the loader, parallel is faster and unseen.
+ */
+let queue: Promise<unknown> = Promise.resolve();
+function queued<T>(job: () => Promise<T>): Promise<T> {
+  if (!isBootDone()) return job();
+  const run = queue.then(job, job);
+  queue = run.catch(() => undefined);
+  return run;
+}
+
+function whenLoaded(img: HTMLImageElement, src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const fail = () => reject(new Error(`image failed: ${src}`));
+    if (img.complete) return img.naturalWidth ? resolve() : fail();
+    img.addEventListener("load", () => resolve(), { once: true });
+    img.addEventListener("error", fail, { once: true });
+  });
+}
+
+/**
+ * Decodes and downsizes the photo off the main thread (fetch hits the HTTP cache the <img> just filled),
+ * so building textures never freezes animation. Falls back to a 2D canvas where createImageBitmap
+ * cannot resize.
+ */
+async function buildTexture(img: HTMLImageElement, tier: QualityTier): Promise<THREE.Texture> {
+  const [w, h] = textureSize(img.naturalWidth, img.naturalHeight, tier);
+  let t: THREE.Texture;
+  try {
+    // force-cache: reuse the bytes the <img> already downloaded, even where the server says "revalidate" (dev).
+    const blob = await (await fetch(img.currentSrc || img.src, { cache: "force-cache" })).blob();
+    const bmp = await createImageBitmap(blob, { resizeWidth: w, resizeHeight: h, resizeQuality: "high", imageOrientation: "flipY" });
+    t = new THREE.Texture(bmp);
+    t.flipY = false; // already flipped during decode
+  } catch {
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+    t = new THREE.CanvasTexture(canvas);
+  }
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.minFilter = THREE.LinearFilter;
+  t.generateMipmaps = false;
+  t.needsUpdate = true;
+  return t;
+}
+
 function releaseTexture(src: string) {
   const hit = cache.get(src);
   if (!hit || --hit.refs > 0) return;
   cache.delete(src);
-  hit.tex.then((t) => t.dispose()).catch(() => undefined);
+  hit.tex
+    .then((t) => {
+      t.dispose();
+      if (t.image instanceof ImageBitmap) t.image.close();
+    })
+    .catch(() => undefined);
 }
 
 function modeFor(fig: HTMLElement): number {
@@ -160,7 +201,9 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
           material.uniforms.uTex.value = tex;
           fig.setAttribute("data-gl-ready", "");
         })
-        .catch(() => fig.setAttribute("data-gl-failed", "")); // the DOM image stays; boot doesn't wait on it
+        .catch(() => {
+          if (!plane.disposed) fig.setAttribute("data-gl-failed", ""); // the DOM image stays; boot doesn't wait on it
+        });
     };
 
     const remove = (fig: HTMLElement) => {
@@ -172,6 +215,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       releaseTexture(fig.dataset.src ?? "");
       p.mesh.material.dispose();
       fig.removeAttribute("data-gl-ready");
+      fig.removeAttribute("data-gl-failed");
       map.delete(fig);
     };
 
