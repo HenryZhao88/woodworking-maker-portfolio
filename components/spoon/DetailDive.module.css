@@ -9,7 +9,8 @@
   bottom: 6vh;
   z-index: 2;
   max-width: 28ch;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-accent), serif;
+  font-style: italic;
   font-size: clamp(26px, 3vw, 48px);
   line-height: 1.1;
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6);

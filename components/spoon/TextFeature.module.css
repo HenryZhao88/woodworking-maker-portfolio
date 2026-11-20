@@ -8,8 +8,6 @@
 .h {
   font-size: clamp(56px, 9.5vw, 190px);
   white-space: nowrap;
-  font-style: italic;
-  font-variation-settings: "SOFT" 100, "opsz" 144;
 }
 .row {
   display: grid;

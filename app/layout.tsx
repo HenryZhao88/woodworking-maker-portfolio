@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -10,14 +11,25 @@ import { SceneDriver } from "@/components/gl/SceneDriver";
 import { RouteTransitionProvider } from "@/components/transitions/RouteTransition";
 import { Loader } from "@/components/Loader";
 
-const display = Fraunces({
-  variable: "--font-display",
-  subsets: ["latin"],
-  axes: ["SOFT", "opsz"],
-  style: ["normal", "italic"],
+// Switzer (Fontshare, free licence): one Swiss sans for titles, text and UI.
+const switzer = localFont({
+  variable: "--font-body",
+  display: "swap",
+  src: [
+    { path: "./fonts/switzer-400.woff2", weight: "400" },
+    { path: "./fonts/switzer-500.woff2", weight: "500" },
+    { path: "./fonts/switzer-600.woff2", weight: "600" },
+  ],
 });
-
-const body = Geist({ variable: "--font-body", subsets: ["latin"] });
+// Zodiak italic (Fontshare): the one contrasting voice, for section headings, the name and captions.
+const zodiak = localFont({
+  variable: "--font-accent",
+  display: "swap",
+  src: [
+    { path: "./fonts/zodiak-401.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/zodiak-400.woff2", weight: "400", style: "normal" },
+  ],
+});
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -29,7 +41,7 @@ export const viewport: Viewport = { themeColor: "#0e0b08" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${mono.variable}`}>
       <body>
         <SmoothScroll>
           <QualityGate />

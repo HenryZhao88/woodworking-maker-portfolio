@@ -11,6 +11,8 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: clamp(16px, 4vw, 56px);
   --nav-h: 72px;
+
+  --font-display: var(--font-body);
 }
 
 *,
@@ -42,11 +44,21 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
   margin: 0;
+}
+/* Section headings speak in the accent voice. */
+h2,
+h3,
+.accent {
+  font-family: var(--font-accent), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 p {

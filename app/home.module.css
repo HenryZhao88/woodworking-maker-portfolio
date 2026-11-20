@@ -22,13 +22,11 @@
   flex-direction: column;
   font-size: clamp(64px, 15.5vw, 280px);
   line-height: 0.86;
-  letter-spacing: -0.045em;
-  font-variation-settings: "SOFT" 100, "opsz" 144;
+  letter-spacing: -0.055em;
 }
 .line1 { display: block; }
 .line2 {
   display: block;
-  font-style: italic;
   padding-left: 0.9em;
   color: var(--fg);
 }
@@ -50,10 +48,12 @@
   animation: grow 1.6s 0.9s var(--ease-out) both;
 }
 .name {
-  font-family: var(--font-mono), monospace;
-  font-size: clamp(13px, 1.1vw, 16px);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  font-family: var(--font-accent), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(24px, 2.6vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--gold);
 }
 
 .scrollCue {
@@ -83,7 +83,7 @@
   padding: 18vh var(--gutter);
   max-width: 1100px;
 }
-.teaserTitle { font-size: clamp(56px, 10vw, 180px); }
+.teaserTitle { font-family: var(--font-display), sans-serif; font-style: normal; font-weight: 500; letter-spacing: -0.05em; line-height: 0.9; font-size: clamp(56px, 10vw, 180px); }
 .teaserCopy { max-width: 34ch; font-size: clamp(18px, 1.6vw, 24px); color: var(--muted); }
 .teaserLink {
   display: inline-flex;

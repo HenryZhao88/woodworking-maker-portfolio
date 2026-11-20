@@ -24,7 +24,7 @@ export default function Home() {
 
         <div className={styles.byline}>
           <span className={styles.rule} aria-hidden />
-          <RevealText as="p" split="words" trigger="mount" delay={0.5} className={styles.name}>
+          <RevealText as="p" split="words" trigger="mount" delay={0.5} className={styles.name} data-testid="byline-name">
             Henry Zhao
           </RevealText>
         </div>
