@@ -1,0 +1,60 @@
+.section { position: relative; }
+.head { padding: 16vh var(--gutter) 8vh; display: flex; flex-direction: column; gap: 24px; max-width: 980px; }
+.h { font-size: clamp(56px, 9vw, 170px); }
+.intro { max-width: 46ch; color: var(--muted); font-size: clamp(17px, 1.3vw, 21px); }
+
+.pin { position: relative; height: 100svh; overflow: hidden; perspective: 1600px; }
+.track {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  align-items: center;
+  gap: 6vw;
+  padding: 0 12vw 0 var(--gutter);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.stage { display: flex; align-items: center; gap: 2.2vw; transform-style: preserve-3d; }
+.stageHead { width: 260px; flex: none; display: flex; flex-direction: column; gap: 14px; align-self: center; }
+.stageNum { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--gold); letter-spacing: 0.2em; }
+.stageLabel { font-size: clamp(34px, 3.2vw, 56px); line-height: 1; }
+.stageCaption { color: var(--muted); font-size: 15px; }
+.card {
+  position: relative;
+  flex: none;
+  height: 62vh;
+  width: calc(62vh * var(--ar));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.card > figure { height: 100%; }
+.cardNum { position: absolute; left: 0; bottom: -28px; font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.2em; }
+
+.rail {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 5vh;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.railIndex { color: var(--muted); }
+.railLabel { color: var(--gold); min-width: 20ch; }
+.barTrack { flex: 1; height: 1px; background: var(--line); position: relative; }
+.bar { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(0); }
+
+@media (max-width: 767px) {
+  .pin { height: auto; overflow: visible; perspective: 1200px; }
+  .rail { display: none; }
+  .track { position: relative; flex-direction: column; align-items: stretch; padding: 0 var(--gutter) 10vh; gap: 12vh; }
+  .stage { flex-direction: column; align-items: stretch; gap: 48px; }
+  .stageHead { width: auto; }
+  .card { width: 100%; height: auto; }
+  .card > figure { height: auto; }
+}
