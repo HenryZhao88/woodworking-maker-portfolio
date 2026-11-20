@@ -32,3 +32,5 @@
   .row, .wipe .row { grid-template-columns: 1fr; }
   .wipe .media { order: 0; }
 }
+/* The WebGL plane performs the grain reveal itself. */
+:global(html:not([data-quality="fallback"])) .media:has([data-gl-ready]) .slats { display: none; }

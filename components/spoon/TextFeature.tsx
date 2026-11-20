@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import { Photo } from "@/components/Photo";
 import { RevealText } from "@/components/RevealText";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
@@ -17,6 +17,8 @@ type Props = {
 };
 
 const SLATS = 9;
+// Server render starts fully revealed; the client tween rewinds it to 0 before first paint of the section.
+const INITIAL_REVEAL = 1;
 
 export function TextFeature({ eyebrow, heading, body, image, variant, id }: Props) {
   const root = useRef<HTMLElement>(null);
@@ -27,6 +29,8 @@ export function TextFeature({ eyebrow, heading, body, image, variant, id }: Prop
       const st = { trigger: "[data-media]", start: "top 80%", end: "center 50%", scrub: 1 };
       if (variant === "grain") {
         gsap.to("[data-slat]", { scaleY: 0, ease: "power2.inOut", stagger: { each: 0.08, from: "random" }, scrollTrigger: st });
+        // Drives the WebGL wood-grain dissolve (read by the plane as --p).
+        gsap.fromTo("[data-media]", { "--p": 0 }, { "--p": 1, ease: "none", scrollTrigger: st });
       } else {
         gsap.fromTo("[data-media]", { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }, { clipPath: "polygon(0% 0%, 130% 0%, 100% 100%, 0% 100%)", ease: "none", scrollTrigger: st });
         gsap.fromTo("[data-media] img", { scale: 1.35, xPercent: -8 }, { scale: 1, xPercent: 0, ease: "none", scrollTrigger: { ...st, end: "bottom 30%" } });
@@ -43,8 +47,14 @@ export function TextFeature({ eyebrow, heading, body, image, variant, id }: Prop
         {heading}
       </RevealText>
       <div className={styles.row}>
-        <div className={styles.media} data-media data-gl-effect={variant === "grain" ? "grainMask" : undefined}>
-          <Photo image={image} sizes="(max-width: 900px) 92vw, 44vw" />
+        <div
+          className={styles.media}
+          data-media
+          data-gl-effect={variant === "grain" ? "grainMask" : undefined}
+          data-gl-progress={variant === "grain" ? "" : undefined}
+          style={variant === "grain" ? ({ "--p": INITIAL_REVEAL } as CSSProperties) : undefined}
+        >
+          <Photo image={image} sizes="(max-width: 900px) 92vw, 44vw" gl={variant === "grain"} />
           {variant === "grain" && (
             <div className={styles.slats} aria-hidden>
               {Array.from({ length: SLATS }, (_, i) => (

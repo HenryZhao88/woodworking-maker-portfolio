@@ -51,7 +51,7 @@ export function Mosaic({ impression, images }: { impression: TextBlock; images: 
       </div>
       <div className={styles.grid} data-gl-effect="mosaic">
         {images.map((img, i) => (
-          <div key={img.src + i} data-tile className={styles.tile}>
+          <div key={img.src + i} data-tile data-gl-fade className={styles.tile}>
             <Photo image={img} sizes="(max-width: 700px) 45vw, 18vw" />
           </div>
         ))}

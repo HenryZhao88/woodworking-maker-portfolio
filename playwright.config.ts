@@ -7,7 +7,13 @@ export default defineConfig({
   timeout: 60_000,
   fullyParallel: true,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${PORT}`, ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+  use: {
+    baseURL: `http://localhost:${PORT}`,
+    ...devices["Desktop Chrome"],
+    viewport: { width: 1440, height: 900 },
+    // NO_WEBGL=1 runs the whole suite against the DOM fallback.
+    launchOptions: process.env.NO_WEBGL ? { args: ["--disable-webgl", "--disable-webgl2", "--disable-3d-apis"] } : {},
+  },
   webServer: {
     command: `npx next dev -p ${PORT}`,
     url: `http://localhost:${PORT}`,
