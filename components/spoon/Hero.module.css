@@ -1,0 +1,17 @@
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3vh;
+  padding: calc(var(--nav-h) + 24px) var(--gutter) 6vh;
+}
+.title {
+  font-size: clamp(72px, 17vw, 320px);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  font-variation-settings: "SOFT" 100, "opsz" 144;
+}
+.word { display: block; }
+.foot { display: flex; align-items: center; gap: 16px; }
+.rule { width: 80px; height: 3px; background: var(--gold); }

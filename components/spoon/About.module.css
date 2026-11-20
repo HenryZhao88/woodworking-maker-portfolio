@@ -1,0 +1,14 @@
+.about {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(32px, 6vw, 120px);
+  align-items: center;
+  padding: 16vh var(--gutter);
+}
+.stage { perspective: 1400px; }
+.copy { display: flex; flex-direction: column; gap: 24px; max-width: 520px; }
+.h { font-size: clamp(40px, 4.6vw, 84px); }
+.p { color: var(--muted); font-size: clamp(16px, 1.2vw, 19px); }
+@media (max-width: 900px) {
+  .about { grid-template-columns: 1fr; }
+}
