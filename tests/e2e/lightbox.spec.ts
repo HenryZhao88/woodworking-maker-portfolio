@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { scrollPin } from "./helpers";
 
 test("clicking a photo opens it full size; Escape closes and restores focus", async ({ page }) => {

@@ -2,6 +2,7 @@
 import { useRef, type ElementType, type ReactNode } from "react";
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { isMorphTarget } from "@/components/transitions/RouteTransition";
+import { isBootDone, onBootDone } from "@/components/bootGate";
 
 type Props = {
   as?: ElementType;
@@ -37,7 +38,10 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
         autoSplit: true,
         onSplit(self) {
           const targets = split === "chars" ? self.chars : split === "words" ? self.words : self.lines;
-          return gsap.from(targets, {
+          // Entrance animations wait for the loader to hand off.
+          const waiting = trigger === "mount" && !isBootDone();
+          const tween = gsap.from(targets, {
+            paused: waiting,
             yPercent: 115,
             rotate: split === "lines" ? 0 : 4,
             duration: split === "chars" ? 1.4 : 1.1,
@@ -46,6 +50,8 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
             delay,
             scrollTrigger: trigger === "scroll" ? { trigger: el, start: "top 88%" } : undefined,
           });
+          if (waiting) onBootDone(() => tween.play());
+          return tween;
         },
       });
       gsap.set(el, { autoAlpha: 1 });

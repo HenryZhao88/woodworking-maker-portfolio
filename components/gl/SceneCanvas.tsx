@@ -7,6 +7,7 @@ import { useLenis } from "@/components/SmoothScroll";
 import { useScene } from "./sceneStore";
 import { PlaneLayer } from "./PlaneLayer";
 import { HomeBackground } from "./HomeBackground";
+import { BootProbe } from "./BootProbe";
 import styles from "./SceneCanvas.module.css";
 
 /**
@@ -26,7 +27,7 @@ export function SceneCanvas() {
       const raw = lenis ? lenis.velocity : 0;
       const target = gsap.utils.clamp(-1, 1, raw / 45);
       velocity.current += (target - velocity.current) * 0.12;
-      advance(performance.now());
+      advance(performance.now() / 1000); // R3F "never" mode expects seconds
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick);
@@ -53,6 +54,7 @@ export function SceneCanvas() {
       >
         <HomeBackground particles={settings.particles} />
         <PlaneLayer velocity={velocity} />
+        <BootProbe />
       </Canvas>
     </div>
   );

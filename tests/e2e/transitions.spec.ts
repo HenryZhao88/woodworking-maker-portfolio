@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("Home → Wooden Spoon morphs shared elements (no blank flash)", async ({ page }) => {
   const errors: string[] = [];

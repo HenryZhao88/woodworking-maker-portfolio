@@ -39,6 +39,7 @@ export function Photo({ image, sizes, className, priority, style, gl = true }: P
         height={image.height}
         sizes={sizes}
         priority={priority}
+        loading={priority ? undefined : "eager"} /* the boot loader waits for every photo, so none load mid-scroll */
         className={styles.img}
         data-w={image.width}
         data-h={image.height}

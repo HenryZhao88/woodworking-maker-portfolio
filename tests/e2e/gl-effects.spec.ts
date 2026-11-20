@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { scrollToY } from "./helpers";
 
 test("favorite photo dissolves in via wood-grain shader progress (--p 0 → 1)", async ({ page }) => {

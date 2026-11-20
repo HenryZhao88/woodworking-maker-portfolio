@@ -114,6 +114,7 @@
 @media (prefers-reduced-motion: reduce) {
   .rule, .cueLine { animation: none; }
 }
+:global(html:not([data-loader-done])) .rule { animation-play-state: paused; }
 @media (max-width: 640px) {
   .title { font-size: 25vw; }
   .line2 { padding-left: 0.35em; }

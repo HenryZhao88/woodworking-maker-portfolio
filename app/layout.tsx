@@ -8,6 +8,7 @@ import { QualityGate } from "@/components/QualityGate";
 import { SceneCanvas } from "@/components/gl/SceneCanvas";
 import { SceneDriver } from "@/components/gl/SceneDriver";
 import { RouteTransitionProvider } from "@/components/transitions/RouteTransition";
+import { Loader } from "@/components/Loader";
 
 const display = Fraunces({
   variable: "--font-display",
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <SmoothScroll>
           <QualityGate />
+          <Loader />
           <SceneCanvas />
           <SceneDriver />
           <RouteTransitionProvider>

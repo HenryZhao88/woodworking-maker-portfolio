@@ -1,4 +1,5 @@
-import { test, expect, chromium } from "@playwright/test";
+import { chromium } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("without WebGL, photos stay visible DOM images and nothing errors", async ({ baseURL }) => {
   const browser = await chromium.launch({ args: ["--disable-webgl", "--disable-webgl2", "--disable-3d-apis"] });
@@ -7,7 +8,7 @@ test("without WebGL, photos stay visible DOM images and nothing errors", async (
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   await page.goto(`${baseURL}/wooden-spoon`);
-  await page.waitForTimeout(1500);
+  await page.waitForSelector("html[data-loader-done]", { state: "attached", timeout: 20000 });
   await expect(page.locator("html")).toHaveAttribute("data-quality", "fallback");
   await expect(page.locator("canvas")).toHaveCount(0);
   const hidden = await page.locator("main [data-photo] img").evaluateAll((els) => els.filter((e) => getComputedStyle(e).opacity === "0").length);

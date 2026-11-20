@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { getProject } from "../../content/projects";
 
 const spoon = getProject("wooden-spoon")!;
