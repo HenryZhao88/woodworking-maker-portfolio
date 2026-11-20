@@ -6,6 +6,7 @@ import { tierSettings } from "@/lib/quality";
 import { useLenis } from "@/components/SmoothScroll";
 import { useScene } from "./sceneStore";
 import { PlaneLayer } from "./PlaneLayer";
+import { HomeBackground } from "./HomeBackground";
 import styles from "./SceneCanvas.module.css";
 
 /**
@@ -50,6 +51,7 @@ export function SceneCanvas() {
           });
         }}
       >
+        <HomeBackground particles={settings.particles} />
         <PlaneLayer velocity={velocity} />
       </Canvas>
     </div>
