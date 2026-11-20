@@ -77,3 +77,43 @@ test("in-flight ghosts keep the source typography (captured before unmount)", as
   expect(sizes.length).toBeGreaterThan(0);
   expect(Math.max(...sizes)).toBeGreaterThan(60); // the hero title ghost is still display-size
 });
+
+const titleLines = (page: import("@playwright/test").Page, sel: string) =>
+  page.evaluate((s) => {
+    const el = [...document.querySelectorAll<HTMLElement>(s)].sort((a, b) => parseFloat(getComputedStyle(b).fontSize) - parseFloat(getComputedStyle(a).fontSize))[0];
+    if (!el) return -1;
+    const cs = getComputedStyle(el);
+    return Math.round(el.offsetHeight / (parseFloat(cs.fontSize) * parseFloat(cs.lineHeight === "normal" ? "1.2" : String(parseFloat(cs.lineHeight) / parseFloat(cs.fontSize)))));
+  }, sel);
+
+for (const width of [1280, 1440, 1512, 1920, 390]) {
+  test(`spoon title is two lines on direct load and stays two lines (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/wooden-spoon");
+    const sel = 'h1[data-flip-id="page-title"]';
+    expect(await titleLines(page, sel)).toBe(2);
+    await page.waitForTimeout(2500); // letter reveal done
+    expect(await titleLines(page, sel)).toBe(2);
+  });
+}
+
+test("the landing title ghost has the same line breaks as the real title (no jump on landing)", async ({ page }) => {
+  await page.setViewportSize({ width: 1512, height: 900 });
+  await page.goto("/");
+  await page.waitForTimeout(1200);
+  await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
+  await expect(page).toHaveURL(/\/wooden-spoon$/);
+  await page.waitForFunction(() => [...document.querySelectorAll("[data-morph-ghost]")].some((g) => /Wooden/.test(g.textContent ?? "") && parseFloat(getComputedStyle(g).fontSize) > 60));
+  const ghost = await titleLines(page, "[data-morph-ghost]");
+  await expect(page.locator("[data-morph-ghost]")).toHaveCount(0, { timeout: 4000 });
+  const real = await titleLines(page, 'h1[data-flip-id="page-title"]');
+  await page.waitForTimeout(2000);
+  expect(await titleLines(page, 'h1[data-flip-id="page-title"]')).toBe(real);
+  expect(real).toBe(2);
+  expect(ghost).toBe(2);
+});
+
+test("spoon title keeps its accessible name with the space", async ({ page }) => {
+  await page.goto("/wooden-spoon");
+  await expect(page.getByRole("heading", { level: 1, name: "Wooden Spoon", exact: true })).toBeVisible();
+});
