@@ -8,6 +8,7 @@ type Props = {
   trigger?: "scroll" | "mount";
   delay?: number;
   className?: string;
+  id?: string;
   children: ReactNode;
   [key: `data-${string}`]: string | undefined;
 };
