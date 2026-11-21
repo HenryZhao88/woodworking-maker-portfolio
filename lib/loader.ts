@@ -15,7 +15,7 @@ export function minLoaderDuration(hw: { cores?: number; memoryGB?: number; warmu
   return 2000;
 }
 
-export function createReadinessGate(keys: string[]): { mark(key: string): void; ready: Promise<void>; progress(): number } {
+export function createReadinessGate(keys: string[]): { mark(key: string): void; ready: Promise<void>; progress(): number; isDone(key: string): boolean } {
   const pending = new Set(keys);
   let resolve!: () => void;
   const ready = new Promise<void>((r) => (resolve = r));
@@ -28,5 +28,6 @@ export function createReadinessGate(keys: string[]): { mark(key: string): void; 
     },
     ready,
     progress: () => (keys.length === 0 ? 1 : (keys.length - pending.size) / keys.length),
+    isDone: (key: string) => !pending.has(key),
   };
 }

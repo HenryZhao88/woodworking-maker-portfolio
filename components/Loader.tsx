@@ -1,10 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getImageProps } from "next/image";
+import { projects } from "@/content/projects";
+import { otherRoutes, sitePreloads } from "@/lib/preload";
+import { AsciiFire } from "@/components/AsciiFire";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { LOADER_HARD_CAP_MS, minLoaderDuration } from "@/lib/loader";
 import { useLenis } from "@/components/SmoothScroll";
 import { useScene } from "@/components/gl/sceneStore";
-import { bootGate, bootStats, finishBoot, markBoot } from "@/components/bootGate";
+import { BOOT_KEYS, bootGate, bootStats, finishBoot, markBoot } from "@/components/bootGate";
 import styles from "./Loader.module.css";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -24,9 +29,10 @@ function measureFrames(n: number): Promise<number> {
 }
 
 /**
- * First-visit loader. Waits for real readiness (fonts, every photo on the page decoded, WebGL
- * compiled with textures uploaded, warm-up frames) plus a hardware-scaled minimum, never longer
- * than the hard cap. Not shown again on client-side navigation.
+ * First-visit loader. Waits for real readiness (fonts, every photo on this page decoded, every photo
+ * and route of the other pages prefetched, WebGL compiled with textures uploaded, warm-up frames) plus a
+ * hardware-scaled minimum, never longer than the hard cap. An ASCII fire burns higher as loading
+ * progresses. Not shown again on client-side navigation.
  */
 export function Loader() {
   const [mounted, setMounted] = useState(true);
@@ -35,6 +41,9 @@ export function Loader() {
   const barRef = useRef<HTMLSpanElement>(null);
   const tier = useScene((s) => s.tier);
   const lenis = useLenis();
+  const router = useRouter();
+  const fire = useRef(0.55); // fire fuel, 0..1
+  const siteFrac = useRef(0); // share of other pages' photos fetched
 
   // Hold the page still while loading.
   useEffect(() => {
@@ -49,6 +58,34 @@ export function Loader() {
     const imgs = [...document.querySelectorAll<HTMLImageElement>("main img")];
     Promise.all(imgs.map((img) => img.decode().catch(() => undefined))).then(() => markBoot("images"));
   }, []);
+
+  // The rest of the site: other pages' code/data and every photo they show, at the exact size they'll
+  // request (same srcset + sizes as the page), so visiting them later is served from cache.
+  useEffect(() => {
+    const path = window.location.pathname;
+    otherRoutes(projects, path).forEach((r) => router.prefetch(r));
+    const list = sitePreloads(projects, path);
+    if (!list.length) {
+      markBoot("site");
+      return;
+    }
+    let settled = 0;
+    const keep: HTMLImageElement[] = [];
+    Promise.all(
+      list.map(({ src, width, height, sizes }) => {
+        const { props } = getImageProps({ src, width, height, sizes, alt: "" });
+        const img = new Image();
+        keep.push(img);
+        if (props.sizes) img.sizes = props.sizes;
+        if (props.srcSet) img.srcset = props.srcSet;
+        img.src = props.src;
+        return img
+          .decode()
+          .catch(() => undefined)
+          .finally(() => (siteFrac.current = ++settled / list.length));
+      })
+    ).then(() => markBoot("site"));
+  }, [router]);
 
   // Without WebGL there is nothing to compile: measure plain frames instead.
   useEffect(() => {
@@ -68,7 +105,11 @@ export function Loader() {
     let raf = 0;
     const tick = () => {
       const timeFrac = Math.min(1, (performance.now() - t0) / 2000);
-      const target = Math.min(0.99, gate.progress() * 0.7 + timeFrac * 0.3);
+      // Readiness steps count whole, except the site preload, which counts photo by photo.
+      const keys = gate.progress() * BOOT_KEYS.length;
+      const steps = (gate.isDone("site") ? keys : keys + siteFrac.current) / BOOT_KEYS.length;
+      const target = Math.min(0.99, steps * 0.7 + timeFrac * 0.3);
+      fire.current = 0.55 + 0.45 * shown;
       shown += (target - shown) * 0.08;
       if (pctRef.current) pctRef.current.textContent = String(Math.round(shown * 100)).padStart(2, "0");
       if (barRef.current) barRef.current.style.transform = `scaleX(${shown})`;
@@ -87,6 +128,7 @@ export function Loader() {
       if (cancelled) return;
       cancelAnimationFrame(raf);
       if (pctRef.current) pctRef.current.textContent = "100";
+      fire.current = 0; // the fire dies down as the board opens
       const el = root.current!;
       const tl = gsap.timeline({ onComplete: () => setMounted(false) });
       if (prefersReducedMotion()) {
@@ -111,7 +153,9 @@ export function Loader() {
   return (
     <div ref={root} className={styles.loader} data-loader role="status" aria-label="Loading">
       <div className={styles.top} />
-      <div className={styles.bottom} />
+      <div className={styles.bottom}>
+        <AsciiFire intensity={fire} className={styles.fire} />
+      </div>
       <div className={styles.line}>
         <span ref={barRef} className={styles.bar} />
       </div>

@@ -1,7 +1,16 @@
 .loader { position: fixed; inset: 0; z-index: 200; pointer-events: all; }
 .top, .bottom { position: absolute; left: 0; right: 0; height: 50%; background: var(--bg); }
 .top { top: 0; }
-.bottom { bottom: 0; }
+.bottom { bottom: 0; overflow: hidden; }
+/* The fire burns in the lower half and fades out before it reaches the readout under the gold line. */
+.fire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to top, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to top, #000 45%, transparent 92%);
+}
 .line { position: absolute; left: var(--gutter); right: var(--gutter); top: 50%; height: 2px; background: var(--line); transform-origin: center; }
 .bar { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(0); }
 .meta {
@@ -19,3 +28,8 @@
 }
 .name { font-family: var(--font-accent), serif; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 20px; color: var(--fg); }
 .pct { font-family: var(--font-display), sans-serif; font-weight: 500; font-size: clamp(40px, 6vw, 88px); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: var(--fg); line-height: 1; position: absolute; left: 50%; transform: translateX(-50%); top: -2px; }
+
+/* Phones: the percentage sits above the gold line so it never collides with the name. */
+@media (max-width: 767px) {
+  .pct { top: auto; bottom: calc(100% + 34px); }
+}

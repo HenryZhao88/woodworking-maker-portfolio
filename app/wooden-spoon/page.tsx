@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProject } from "@/content/projects";
-import type { Project, ProjectImage } from "@/content/types";
+import { mosaicImages } from "@/lib/preload";
 import { Hero } from "@/components/spoon/Hero";
 import { About } from "@/components/spoon/About";
 import { TextFeature } from "@/components/spoon/TextFeature";
@@ -11,17 +11,6 @@ import { OverallViews } from "@/components/spoon/OverallViews";
 import { DetailDive } from "@/components/spoon/DetailDive";
 
 export const metadata: Metadata = { title: "Wooden Spoon" };
-
-function allImages(p: Project): ProjectImage[] {
-  const all = [
-    ...(p.about ? [p.about.image] : []),
-    ...(p.process?.stages.flatMap((s) => s.images) ?? []),
-    ...(p.favorite ? [p.favorite.image] : []),
-    ...(p.challenging ? [p.challenging.image] : []),
-    ...(p.finished ? [...p.finished.overall, ...p.finished.details] : []),
-  ];
-  return all.filter((img, i) => all.findIndex((o) => o.src === img.src) === i); // a photo may serve two sections
-}
 
 export default function WoodenSpoon() {
   const p = getProject("wooden-spoon");
@@ -35,7 +24,7 @@ export default function WoodenSpoon() {
       <TextFeature id="challenging-h" eyebrow="Most challenging" variant="wipe" {...p.challenging} />
       <OverallViews views={p.finished.overall} />
       <DetailDive details={p.finished.details} />
-      <Mosaic impression={p.impression} images={allImages(p)} />
+      <Mosaic impression={p.impression} images={mosaicImages(p)} />
     </main>
   );
 }

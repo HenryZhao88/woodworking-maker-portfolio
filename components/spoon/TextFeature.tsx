@@ -1,6 +1,7 @@
 "use client";
 import { Fragment, useRef, type CSSProperties } from "react";
 import { Photo } from "@/components/Photo";
+import { PHOTO_SIZES } from "@/lib/photoSizes";
 import { RevealText } from "@/components/RevealText";
 import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
@@ -57,7 +58,7 @@ export function TextFeature({ eyebrow, heading, body, quote, image, variant, id 
           data-gl-progress={variant === "grain" ? "" : undefined}
           style={variant === "grain" ? ({ "--p": INITIAL_REVEAL } as CSSProperties) : undefined}
         >
-          <Photo image={image} sizes="(max-width: 900px) 92vw, 44vw" gl={variant === "grain"} />
+          <Photo image={image} sizes={PHOTO_SIZES.feature} gl={variant === "grain"} />
           {variant === "grain" && (
             <div className={styles.slats} aria-hidden>
               {Array.from({ length: SLATS }, (_, i) => (

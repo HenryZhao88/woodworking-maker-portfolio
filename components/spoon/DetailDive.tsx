@@ -1,6 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { Photo } from "@/components/Photo";
+import { PHOTO_SIZES } from "@/lib/photoSizes";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import type { ProjectImage } from "@/content/types";
 import styles from "./DetailDive.module.css";
@@ -42,7 +43,7 @@ export function DetailDive({ details }: { details: ProjectImage[] }) {
           <div className={styles.sticky}>
             <span className={`eyebrow ${styles.tag}`}>Detail 0{i + 1}</span>
             <div className={styles.frame} data-dive-frame style={{ width: `min(34vw, calc(46svh * ${d.width / d.height}))` }}>
-              <Photo image={d} sizes="100vw" />
+              <Photo image={d} sizes={PHOTO_SIZES.detail} />
             </div>
             <div className={styles.scrim} data-dive-scrim aria-hidden />
             <p className={styles.cap} data-dive-cap>

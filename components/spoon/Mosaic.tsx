@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { Photo } from "@/components/Photo";
+import { PHOTO_SIZES } from "@/lib/photoSizes";
 import { RevealText } from "@/components/RevealText";
 import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
@@ -53,7 +54,7 @@ export function Mosaic({ impression, images }: { impression: TextBlock; images: 
       <div className={styles.grid} data-gl-effect="mosaic">
         {images.map((img, i) => (
           <div key={img.src + i} data-tile data-gl-fade className={styles.tile}>
-            <Photo image={img} sizes="(max-width: 700px) 45vw, 18vw" />
+            <Photo image={img} sizes={PHOTO_SIZES.mosaic} />
           </div>
         ))}
       </div>

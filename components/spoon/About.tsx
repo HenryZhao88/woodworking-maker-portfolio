@@ -1,6 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { Photo } from "@/components/Photo";
+import { PHOTO_SIZES } from "@/lib/photoSizes";
 import { RevealText } from "@/components/RevealText";
 import { Rich } from "@/components/Rich";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
@@ -33,7 +34,7 @@ export function About({ about }: { about: NonNullable<Project["about"]> }) {
     <section ref={root} className={styles.about} aria-labelledby="about-h">
       <div className={styles.stage}>
         <div data-unfold data-gl-effect="unfold">
-          <Photo image={about.image} sizes="(max-width: 900px) 92vw, 56vw" priority />
+          <Photo image={about.image} sizes={PHOTO_SIZES.about} priority />
         </div>
       </div>
       <div className={styles.copy}>

@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { Photo } from "@/components/Photo";
+import { PHOTO_SIZES } from "@/lib/photoSizes";
 import { RevealText } from "@/components/RevealText";
 import { Rich } from "@/components/Rich";
 import { gsap, ScrollTrigger, useGSAP, exposePin } from "@/lib/gsap";
@@ -150,7 +151,7 @@ export function ProcessStrip({ process }: { process: Process }) {
                 const n = stageStart[si] + ii + 1;
                 return (
                   <div key={img.src} className={styles.card} data-card data-gl-fade style={{ ["--ar" as string]: img.width / img.height }}>
-                    <Photo image={img} sizes="(max-width: 767px) 88vw, 40vw" />
+                    <Photo image={img} sizes={PHOTO_SIZES.process} />
                     <span className={styles.cardNum}>{String(n).padStart(2, "0")}</span>
                   </div>
                 );

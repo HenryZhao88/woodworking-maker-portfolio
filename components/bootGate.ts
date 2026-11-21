@@ -1,8 +1,8 @@
 "use client";
 import { createReadinessGate } from "@/lib/loader";
 
-/** What "fully loaded" means for the first visit. */
-export const BOOT_KEYS = ["fonts", "images", "gl", "warmup"] as const;
+/** What "fully loaded" means for the first visit ("site": every other page's photos and code, prefetched). */
+export const BOOT_KEYS = ["fonts", "images", "site", "gl", "warmup"] as const;
 export type BootKey = (typeof BOOT_KEYS)[number];
 
 let gate: ReturnType<typeof createReadinessGate> | null = null;
