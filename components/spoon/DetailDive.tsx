@@ -2,17 +2,16 @@
 import { useRef } from "react";
 import { Photo } from "@/components/Photo";
 import { PHOTO_SIZES } from "@/lib/photoSizes";
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion, exposePin } from "@/lib/gsap";
+import { gsap, ScrollTrigger, SplitText, useGSAP, prefersReducedMotion, exposePin } from "@/lib/gsap";
 import { isEditMode } from "@/lib/editMode";
 import type { ProjectImage } from "@/content/types";
 import styles from "./DetailDive.module.css";
 
-const SCRAMBLE_CHARS = "abcdefghijklmnopqrstuvwxyz";
-
 /**
  * The inspection bench: one pinned section steps through the three details. Each photo arrives with a
  * tear along the grain and a color split (WebGL "inspect" mode, driven by the frame's opacity), inside
- * gold viewfinder brackets; the big number counts 01 → 03 and each caption scrambles into place.
+ * gold viewfinder brackets; the big number rolls 01 → 03 like an odometer and each caption pulls into
+ * focus word by word, like a lens finding the subject.
  * Every photo is shown whole. Reduced motion: a static list.
  */
 export function DetailDive({ details }: { details: ProjectImage[] }) {
@@ -31,22 +30,38 @@ export function DetailDive({ details }: { details: ProjectImage[] }) {
       }
       const n = frames.length;
       gsap.set(frames.slice(1), { opacity: 0 });
+      const edit = isEditMode();
+      // Captions split into words once (kept as real text) so each can blur into focus.
+      const splits = edit ? [] : caps.map((c) => SplitText.create(c, { type: "words", aria: "none" }));
+      splits.forEach((s) => s.words.forEach((w) => w.setAttribute("data-word", "")));
+      let current = 0;
 
       const show = (i: number) => {
         pin.setAttribute("data-detail-active", String(i + 1));
         frames.forEach((f, k) => f.toggleAttribute("data-active", k === i));
         ticks.forEach((t, k) => t.toggleAttribute("data-active", k <= i));
-        caps.forEach((c, k) => {
-          const active = k === i;
-          c.toggleAttribute("data-active", active);
-          gsap.killTweensOf(c);
-          c.textContent = c.dataset.text ?? "";
-          if (active && !isEditMode())
-            gsap.from(c, { duration: 1.1, scrambleText: { text: c.dataset.text ?? "", chars: SCRAMBLE_CHARS, speed: 0.7, revealDelay: 0.15 }, ease: "none" });
-        });
+        caps.forEach((c, k) => c.toggleAttribute("data-active", k === i));
+        const words = splits[i]?.words;
+        if (words) {
+          gsap.killTweensOf(words);
+          // Focus pull: each word starts soft and low, then sharpens into place.
+          gsap.fromTo(words, { opacity: 0, filter: "blur(12px)", y: 10 }, { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.9, stagger: 0.05, ease: "power3.out" });
+        }
+        // Odometer: the old number rolls out, the new one rolls in (downward when scrolling back up).
+        const dir = i >= current ? 1 : -1;
+        current = i;
         gsap.killTweensOf(num);
-        num.textContent = `0${i + 1}`;
-        if (!isEditMode()) gsap.from(num, { duration: 0.6, scrambleText: { text: `0${i + 1}`, chars: "0123456789", speed: 1 } });
+        if (edit) {
+          num.textContent = `0${i + 1}`;
+          return;
+        }
+        gsap
+          .timeline()
+          .to(num, { yPercent: -110 * dir, duration: 0.22, ease: "power2.in" })
+          .call(() => {
+            num.textContent = `0${i + 1}`;
+          })
+          .fromTo(num, { yPercent: 110 * dir }, { yPercent: 0, duration: 0.55, ease: "expo.out" });
       };
 
       // Hold each detail, with a cut between them: the outgoing photo tears away as the next resolves.
@@ -84,6 +99,7 @@ export function DetailDive({ details }: { details: ProjectImage[] }) {
       tl.to({}, { duration: hold });
       exposePin(pin, tl.scrollTrigger as ScrollTrigger);
       show(0);
+      return () => splits.forEach((s) => s.revert());
     },
     { scope: root }
   );
@@ -97,15 +113,17 @@ export function DetailDive({ details }: { details: ProjectImage[] }) {
               Up close
             </span>
             <span className={styles.count} aria-hidden>
-              <span className={styles.num} data-detail-num>
-                01
+              <span className={styles.numMask}>
+                <span className={styles.num} data-detail-num>
+                  01
+                </span>
               </span>
               <span className={styles.of}>/ 0{details.length}</span>
             </span>
           </div>
           <div className={styles.caps}>
             {details.map((d, i) => (
-              <p key={d.src} className={styles.cap} data-detail-cap data-text={d.caption} data-active={i === 0 ? "" : undefined}>
+              <p key={d.src} className={styles.cap} data-detail-cap data-active={i === 0 ? "" : undefined}>
                 {d.caption}
               </p>
             ))}

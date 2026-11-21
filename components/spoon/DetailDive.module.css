@@ -15,7 +15,10 @@
 .side { display: flex; flex-direction: column; justify-content: center; gap: 3.5vh; min-width: 0; }
 .head { display: flex; flex-direction: column; gap: 10px; }
 .count { display: flex; align-items: baseline; gap: 12px; }
+/* Odometer window: the number rolls inside it. */
+.numMask { display: inline-block; overflow: hidden; padding-bottom: 0.06em; }
 .num {
+  display: inline-block;
   font-family: var(--font-numeral), Georgia, serif;
   font-weight: 500;
   font-size: clamp(72px, 10vw, 180px);
