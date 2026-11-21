@@ -84,6 +84,30 @@ for (const [w, h] of [[1440, 900], [1000, 480], [390, 664]]) {
   });
 }
 
+for (const [w, h] of [[1440, 900], [390, 664]]) {
+  test(`gold brackets sit exactly on the photo's corners (${w}x${h})`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h });
+    await page.goto("/wooden-spoon");
+    for (const n of [1, 2, 3] as const) {
+      await scrollPin(page, "[data-details]", at[n]);
+      await page.waitForTimeout(1600);
+      const off = await page.evaluate(() => {
+        const f = document.querySelector("[data-details] [data-detail-frame][data-active]")!;
+        const p = f.querySelector("[data-photo]")!.getBoundingClientRect();
+        const c = (k: string) => f.querySelector(`[data-corner="${k}"]`)!.getBoundingClientRect();
+        // Outer corner of each bracket vs the photo corner: the 2px line sits just outside the edge.
+        return [
+          c("tl").left - p.left, c("tl").top - p.top,
+          c("tr").right - p.right, c("tr").top - p.top,
+          c("bl").left - p.left, c("bl").bottom - p.bottom,
+          c("br").right - p.right, c("br").bottom - p.bottom,
+        ].map((d) => Math.abs(Math.abs(d) - 2));
+      });
+      expect(Math.max(...off), `detail ${n}: ${off.join(",")}`).toBeLessThanOrEqual(1);
+    }
+  });
+}
+
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
   test("all three details and captions show as a static list", async ({ page }) => {

@@ -59,12 +59,12 @@
 }
 .view > figure { width: 100%; }
 
-/* Gold viewfinder brackets around the photo. */
-.corner { position: absolute; width: 22px; height: 22px; border: 0 solid var(--gold); pointer-events: none; }
-.corner[data-corner="tl"] { top: -12px; left: -12px; border-top-width: 2px; border-left-width: 2px; }
-.corner[data-corner="tr"] { top: -12px; right: -12px; border-top-width: 2px; border-right-width: 2px; }
-.corner[data-corner="bl"] { bottom: -12px; left: -12px; border-bottom-width: 2px; border-left-width: 2px; }
-.corner[data-corner="br"] { bottom: -12px; right: -12px; border-bottom-width: 2px; border-right-width: 2px; }
+/* Gold viewfinder brackets hugging the photo's corners: the 2px line sits right on the photo edge. */
+.corner { position: absolute; z-index: 2; width: 22px; height: 22px; border: 0 solid var(--gold); pointer-events: none; }
+.corner[data-corner="tl"] { top: -2px; left: -2px; border-top-width: 2px; border-left-width: 2px; }
+.corner[data-corner="tr"] { top: -2px; right: -2px; border-top-width: 2px; border-right-width: 2px; }
+.corner[data-corner="bl"] { bottom: -2px; left: -2px; border-bottom-width: 2px; border-left-width: 2px; }
+.corner[data-corner="br"] { bottom: -2px; right: -2px; border-bottom-width: 2px; border-right-width: 2px; }
 
 /* Phones: number on top, photo in the middle band, caption below. */
 @media (max-width: 767px) {
