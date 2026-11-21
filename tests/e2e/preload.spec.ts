@@ -5,7 +5,7 @@ test("first visit to Home preloads every photo the spoon page will show (and pre
   const fetched = new Set<string>();
   page.on("request", (r) => {
     const u = new URL(r.url());
-    if (u.pathname === "/_next/image") fetched.add(u.pathname + u.search);
+    if (u.pathname.startsWith("/img/")) fetched.add(u.pathname + u.search);
   });
   await page.goto("/"); // waits for the loader to hand off
   const duringLoader = new Set(fetched);
@@ -43,14 +43,25 @@ raw("the loading screen shows an animated ASCII fire", async ({ page }) => {
   rawExpect(changed, "fire frames should change").toBe(true);
 });
 
-test("photos are never downloaded twice: WebGL textures are built from the loaded <img>, not a re-fetch", async ({ page }) => {
-  const refetched: string[] = [];
-  page.on("request", (r) => {
-    if (r.resourceType() === "fetch" && r.url().includes("/_next/image")) refetched.push(r.url());
+test("photos are never downloaded twice: texture builds after a page change are served from the browser cache", async ({ page }) => {
+  // Chrome's network log says, per request, whether it was answered from cache or went over the network.
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Network.enable");
+  const fetches = new Map<string, string>();
+  const fromNetwork = new Set<string>();
+  let navigated = false;
+  cdp.on("Network.requestWillBeSent", (e) => {
+    if (navigated && e.type === "Fetch" && e.request.url.includes("/img/projects/")) fetches.set(e.requestId, e.request.url);
+  });
+  cdp.on("Network.responseReceived", (e) => {
+    if (fetches.has(e.requestId) && !e.response.fromDiskCache && !e.response.fromPrefetchCache && !e.response.fromServiceWorker) fromNetwork.add(fetches.get(e.requestId)!);
   });
   await page.goto("/");
+  navigated = true;
   await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
   await expect(page.locator("[data-photo][data-gl-ready]").first()).toBeAttached({ timeout: 15000 });
   await page.waitForTimeout(1500);
-  expect(refetched).toEqual([]);
+  expect(fetches.size, "texture builds read the photo bytes").toBeGreaterThan(0);
+  expect([...fromNetwork], "photos downloaded again").toEqual([]);
 });
+

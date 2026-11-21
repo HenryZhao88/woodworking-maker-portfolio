@@ -63,17 +63,32 @@ function whenLoaded(img: HTMLImageElement, src: string): Promise<void> {
 }
 
 /**
- * Decodes and downsizes the photo off the main thread from the already-loaded <img>,
- * so building textures never freezes animation and never downloads the photo twice. Falls back to a 2D canvas where createImageBitmap
- * cannot resize.
+ * The photo's bytes, re-read from the browser cache: photos are static files (see lib/imageLoader.ts), so
+ * the exact URL the <img> loaded is already cached and this never downloads it again.
+ */
+async function photoBlob(img: HTMLImageElement): Promise<Blob> {
+  const res = await fetch(img.currentSrc || img.src, { cache: "force-cache" });
+  if (!res.ok) throw new Error(`photo fetch ${res.status}`);
+  return res.blob();
+}
+
+/**
+ * Decodes and downsizes the photo off the main thread. The source is the photo's bytes (a Blob, which the
+ * browser decodes on a background thread), not the <img>: decoding from an element runs synchronously on
+ * the main thread and froze page transitions. Falls back to the element, then to a 2D canvas.
  */
 async function buildTexture(img: HTMLImageElement, tier: QualityTier): Promise<THREE.Texture> {
   const [w, h] = textureSize(img.naturalWidth, img.naturalHeight, tier);
+  const opts: ImageBitmapOptions = { resizeWidth: w, resizeHeight: h, resizeQuality: "high", imageOrientation: "flipY" };
   let t: THREE.Texture;
   try {
-    // Straight from the loaded <img>: re-fetching would miss the cache (the image server varies on Accept).
-    await img.decode();
-    const bmp = await createImageBitmap(img, { resizeWidth: w, resizeHeight: h, resizeQuality: "high", imageOrientation: "flipY" });
+    let bmp: ImageBitmap;
+    try {
+      bmp = await createImageBitmap(await photoBlob(img), opts);
+    } catch {
+      await img.decode();
+      bmp = await createImageBitmap(img, opts);
+    }
     t = new THREE.Texture(bmp);
     t.flipY = false; // already flipped during decode
   } catch {

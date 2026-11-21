@@ -20,7 +20,7 @@ export default defineConfig({
     { name: "editor", testMatch: /dev-editor/, dependencies: ["site"] },
   ],
   webServer: {
-    command: `npx next dev -p ${PORT}`,
+    command: `node scripts/image-variants.mjs && npx next dev -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
     timeout: 120_000,

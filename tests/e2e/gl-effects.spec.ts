@@ -47,16 +47,20 @@ test("WebGL photos stay clipped to their section (the detail bench never bleeds 
 
 test("page change builds photo textures off the main thread, one decode at a time (no stutter during the morph)", async ({ page }) => {
   await page.addInitScript(() => {
-    const w = window as unknown as { __dec: { active: number; max: number; total: number; draw2d: number } };
-    w.__dec = { active: 0, max: 0, total: 0, draw2d: 0 };
+    const w = window as unknown as { __dec: { active: number; max: number; total: number; draw2d: number; syncMs: number } };
+    w.__dec = { active: 0, max: 0, total: 0, draw2d: 0, syncMs: 0 };
     const orig = window.createImageBitmap.bind(window);
     // @ts-expect-error test wrapper keeps the original signature
     window.createImageBitmap = async (...args: Parameters<typeof createImageBitmap>) => {
       w.__dec.active++;
       w.__dec.total++;
       w.__dec.max = Math.max(w.__dec.max, w.__dec.active);
+      // Time the call itself: decoding an <img> source happens right here, blocking the main thread.
+      const t0 = performance.now();
+      const pending = orig(...args);
+      w.__dec.syncMs += performance.now() - t0;
       try {
-        return await orig(...args);
+        return await pending;
       } finally {
         w.__dec.active--;
       }
@@ -72,8 +76,9 @@ test("page change builds photo textures off the main thread, one decode at a tim
   await page.getByRole("navigation").getByRole("link", { name: "Wooden Spoon", exact: true }).click();
   await expect(page.locator("[data-photo][data-gl-ready]").first()).toBeAttached({ timeout: 15000 });
   await page.waitForTimeout(1500);
-  const d = await page.evaluate(() => (window as unknown as { __dec: { max: number; total: number; draw2d: number } }).__dec);
+  const d = await page.evaluate(() => (window as unknown as { __dec: { max: number; total: number; draw2d: number; syncMs: number } }).__dec);
   expect(d.total, "textures were built").toBeGreaterThan(0);
+  expect(d.syncMs, `main thread blocked by decodes across ${d.total} textures (ms)`).toBeLessThan(40);
   expect(d.max, "parallel decodes").toBe(1);
   expect(d.draw2d, "photos resized on the main thread").toBe(0);
 });
