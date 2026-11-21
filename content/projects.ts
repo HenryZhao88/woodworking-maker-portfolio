@@ -63,7 +63,7 @@ export const projects: Project[] = [
         {
           label: "Band Saw Cuts",
           when: "Oct 14 to 20",
-          caption: "Ms. Bernstein started the side cut on the band saw and let me finish it. I sanded everything flat, then she cut the outline from above and it all starting coming together!",
+          caption: "Ms. Bernstein started the side cut on the band saw and let me finish it. I sanded everything flat, then she cut the outline from above and it all started coming together!",
           images: [
             proc(5, "Ms. Bernstein cutting the spoon's side profile on the band saw"),
             proc(6, "Finishing the side-profile cut on the band saw"),
