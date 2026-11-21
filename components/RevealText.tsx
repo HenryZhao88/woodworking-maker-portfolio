@@ -3,6 +3,7 @@ import { useRef, type ElementType, type ReactNode } from "react";
 import { gsap, SplitText, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { isMorphTarget } from "@/components/transitions/RouteTransition";
 import { isBootDone, onBootDone } from "@/components/bootGate";
+import { isEditMode } from "@/lib/editMode";
 
 type Props = {
   as?: ElementType;
@@ -23,6 +24,11 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
     () => {
       const el = ref.current;
       if (!el) return;
+      if (isEditMode()) {
+        // Click-to-edit: plain, unsplit text so it can be typed into.
+        gsap.set(el, { autoAlpha: 1 });
+        return;
+      }
       if (isMorphTarget(el)) {
         // A page-transition ghost is landing on this element: show it as-is.
         gsap.set(el, { autoAlpha: 1 });

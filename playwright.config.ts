@@ -14,6 +14,11 @@ export default defineConfig({
     // NO_WEBGL=1 runs the whole suite against the DOM fallback.
     launchOptions: process.env.NO_WEBGL ? { args: ["--disable-webgl", "--disable-webgl2", "--disable-3d-apis"] } : {},
   },
+  // The editor test rewrites source files (then restores them), which hot-reloads open pages, so it runs last, alone.
+  projects: [
+    { name: "site", testIgnore: /dev-editor/ },
+    { name: "editor", testMatch: /dev-editor/, dependencies: ["site"] },
+  ],
   webServer: {
     command: `npx next dev -p ${PORT}`,
     url: `http://localhost:${PORT}`,

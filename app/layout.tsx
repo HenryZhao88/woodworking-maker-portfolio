@@ -9,6 +9,7 @@ import { SceneCanvas } from "@/components/gl/SceneCanvas";
 import { SceneDriver } from "@/components/gl/SceneDriver";
 import { RouteTransitionProvider } from "@/components/transitions/RouteTransition";
 import { Loader } from "@/components/Loader";
+import { DevEditor } from "@/components/DevEditor";
 
 // Switzer (Fontshare, free licence): one Swiss sans for titles, text and UI.
 const switzer = localFont({
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Nav />
               {children}
             </LightboxProvider>
+            <DevEditor />
           </RouteTransitionProvider>
         </SmoothScroll>
       </body>
