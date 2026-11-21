@@ -106,6 +106,7 @@ function modeFor(fig: HTMLElement): number {
   if (effect === "strip") return PLANE_MODE.strip;
   if (effect === "grainMask") return PLANE_MODE.grain;
   if (effect === "displace") return PLANE_MODE.displace;
+  if (effect === "inspect") return PLANE_MODE.inspect;
   return PLANE_MODE.generic;
 }
 

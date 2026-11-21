@@ -1,37 +1,92 @@
 .section { position: relative; }
-.block { height: 260svh; }
-.sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; }
-.frame { position: relative; will-change: transform; }
-.tag { position: absolute; top: calc(var(--nav-h) + 3vh); left: var(--gutter); z-index: 2; padding: 6px 12px; border-radius: 999px; background: rgba(14, 11, 8, 0.72); }
-/* Keeps the caption readable over light photo backgrounds (the canvas sits under the DOM). */
-.scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  visibility: hidden;
-  background:
-    radial-gradient(120% 70% at 0% 100%, rgba(14, 11, 8, 0.92) 0%, rgba(14, 11, 8, 0.7) 35%, rgba(14, 11, 8, 0) 70%);
+
+/* Desktop: text column on the left, the photo bench on the right. */
+.pin {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) 1.2fr;
+  gap: 4vw;
+  padding: calc(var(--nav-h) + 4vh) var(--gutter) 6vh;
+  box-sizing: border-box;
 }
+
+.side { display: flex; flex-direction: column; justify-content: center; gap: 3.5vh; min-width: 0; }
+.head { display: flex; flex-direction: column; gap: 10px; }
+.count { display: flex; align-items: baseline; gap: 12px; }
+.num {
+  font-family: var(--font-numeral), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(72px, 10vw, 180px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.of { color: var(--muted); font-size: 14px; }
+
+/* The three captions share one spot; only the current one shows. */
+.caps { display: grid; }
 .cap {
-  position: absolute;
-  left: var(--gutter);
-  bottom: 6vh;
-  z-index: 2;
-  max-width: 28ch;
-  font-family: var(--font-accent), serif;
+  grid-area: 1 / 1;
+  max-width: 24ch;
+  font-family: var(--font-accent), Georgia, serif;
   font-style: italic;
-  font-size: clamp(26px, 3vw, 48px);
-  line-height: 1.1;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6);
+  font-size: clamp(24px, 2.4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-out);
 }
+.cap[data-active] { opacity: 1; pointer-events: auto; }
+
+.ticks { display: flex; gap: 8px; }
+.tick { width: 36px; height: 2px; background: var(--line); transition: background 0.4s var(--ease-out); }
+.tick[data-active] { background: var(--gold); }
+
+/* The photo is sized to its band (container units), so it is always shown whole. */
+.stage { position: relative; min-height: 0; container-type: size; }
+.frame { position: absolute; inset: 0; display: grid; place-items: center; will-change: transform, opacity; pointer-events: none; }
+.frame[data-active] .view { pointer-events: auto; }
+.view {
+  position: relative;
+  width: min(86cqw, calc(86cqh * var(--ar)));
+}
+.view > figure { width: 100%; }
+
+/* Gold viewfinder brackets around the photo. */
+.corner { position: absolute; width: 22px; height: 22px; border: 0 solid var(--gold); pointer-events: none; }
+.corner[data-corner="tl"] { top: -12px; left: -12px; border-top-width: 2px; border-left-width: 2px; }
+.corner[data-corner="tr"] { top: -12px; right: -12px; border-top-width: 2px; border-right-width: 2px; }
+.corner[data-corner="bl"] { bottom: -12px; left: -12px; border-bottom-width: 2px; border-left-width: 2px; }
+.corner[data-corner="br"] { bottom: -12px; right: -12px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* Phones: number on top, photo in the middle band, caption below. */
 @media (max-width: 767px) {
-  .frame { width: min(64vw, calc(46svh * 0.8)) !important; }
-  .block { height: 200svh; }
+  .pin {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 2.5vh;
+    padding: calc(var(--nav-h) + 8px) var(--gutter) 4vh;
+  }
+  .side { display: contents; }
+  .head { grid-row: 1; flex-direction: row; align-items: baseline; justify-content: space-between; }
+  .num { font-size: 64px; }
+  .stage { grid-row: 2; }
+  .caps { grid-row: 3; }
+  .ticks { display: none; }
+  .cap { font-size: 22px; max-width: none; }
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .block { height: auto; }
-  .sticky { position: relative; height: auto; padding: 12vh 0; }
-  .cap { position: static; margin-top: 24px; }
-  .scrim { display: none; }
+  .pin { height: auto; display: block; overflow: visible; padding: 14vh var(--gutter); }
+  .side { display: flex; margin-bottom: 6vh; justify-content: flex-start; }
+  .caps { display: flex; flex-direction: column; gap: 12px; }
+  .cap { grid-area: auto; opacity: 1; }
+  .ticks { display: none; }
+  .stage { container-type: normal; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; }
+  .frame { position: static; }
+  .view { width: 100%; }
 }

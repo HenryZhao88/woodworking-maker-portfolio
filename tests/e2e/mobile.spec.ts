@@ -60,17 +60,6 @@ test("phone: the 'From every side' heading is not covered by the photo", async (
   }
 });
 
-test("phone: detail labels stay readable over light photos", async ({ page }) => {
-  await page.goto("/wooden-spoon");
-  const block = page.locator("[data-dive]").first();
-  const [top, h] = await block.evaluate((el) => [el.getBoundingClientRect().top + scrollY, (el as HTMLElement).offsetHeight]);
-  await scrollToY(page, Math.round(top + h - page.viewportSize()!.height * 1.15));
-  await page.waitForTimeout(1200);
-  const tag = block.locator("span.eyebrow");
-  await tag.evaluate((el) => ((el as HTMLElement).style.color = "transparent"));
-  expect(await luminance(await page.screenshot({ clip: (await tag.boundingBox())! }))).toBeLessThan(90);
-});
-
 test("phone: a soft scrim sits behind the nav so text scrolling under it doesn't collide", async ({ page }) => {
   await page.goto("/wooden-spoon");
   const lede = page.locator("main p").filter({ hasText: /\w{4,}/ }).first();

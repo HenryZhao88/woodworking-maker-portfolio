@@ -1,6 +1,6 @@
 import { NOISE } from "./noise";
 
-export const PLANE_MODE = { generic: 0, strip: 1, grain: 2, displace: 3 } as const;
+export const PLANE_MODE = { generic: 0, strip: 1, grain: 2, displace: 3, inspect: 4 } as const;
 
 export const planeVertex = /* glsl */ `
 uniform mat3 uH;        // unit square -> clip space (projective)
@@ -44,11 +44,20 @@ void main() {
     uv += (vec2(n, fbm(uv * 3.0 + 7.3)) - 0.5) * 0.35 * t;
   }
 
-  float shift = clamp(uVel, -1.0, 1.0) * 0.012;
+  vec2 split = vec2(0.0, clamp(uVel, -1.0, 1.0) * 0.012);
+  if (uMode == 4.0) {
+    // inspection cut: as the photo fades, rows tear sideways along the grain and the color channels split
+    float t = 1.0 - uAlpha;
+    float row = floor(uv.y * 54.0);
+    float tear = fbm(vec2(row * 0.41, floor(uTime * 12.0) * 0.13)) - 0.5;
+    uv.x += tear * 0.28 * t * t;
+    uv.y += (fbm(uv * 3.0 + 7.0) - 0.5) * 0.03 * t;
+    split += vec2(0.045 * t, 0.0);
+  }
   vec3 col = vec3(
-    texture2D(uTex, uv + vec2(0.0, shift)).r,
+    texture2D(uTex, uv + split).r,
     texture2D(uTex, uv).g,
-    texture2D(uTex, uv - vec2(0.0, shift)).b
+    texture2D(uTex, uv - split).b
   );
 
   if (uMode == 2.0) {

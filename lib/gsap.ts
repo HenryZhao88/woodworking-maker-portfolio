@@ -4,10 +4,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { Flip } from "gsap/Flip";
 import { CustomEase } from "gsap/CustomEase";
+import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 import { useGSAP } from "@gsap/react";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, SplitText, Flip, CustomEase, useGSAP);
+  gsap.registerPlugin(ScrollTrigger, SplitText, Flip, CustomEase, ScrambleTextPlugin, useGSAP);
   CustomEase.create("expo.soft", "0.16, 1, 0.3, 1");
 }
 

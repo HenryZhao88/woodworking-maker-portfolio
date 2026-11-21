@@ -28,12 +28,17 @@ raw("the loading screen shows an animated ASCII fire", async ({ page }) => {
   const fire = page.locator("[data-loader] canvas[data-fire]");
   await rawExpect(fire).toBeVisible({ timeout: 5000 });
   // Read the canvas pixels directly (instant), twice, a few frames apart.
+  // Sample while the loader is still up (once it hands off, the fire is told to die out).
   const changed = await fire.evaluate(async (c) => {
     const canvas = c as HTMLCanvasElement;
-    await new Promise((r) => setTimeout(r, 200));
-    const a = canvas.toDataURL();
-    await new Promise((r) => setTimeout(r, 200));
-    return a !== canvas.toDataURL();
+    let prev = canvas.toDataURL();
+    for (let i = 0; i < 8 && !document.documentElement.hasAttribute("data-loader-done"); i++) {
+      await new Promise((r) => setTimeout(r, 70));
+      const now = canvas.toDataURL();
+      if (now !== prev) return true;
+      prev = now;
+    }
+    return false;
   });
   rawExpect(changed, "fire frames should change").toBe(true);
 });
