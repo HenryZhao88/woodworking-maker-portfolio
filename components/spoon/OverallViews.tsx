@@ -69,7 +69,7 @@ export function OverallViews({ views }: { views: ProjectImage[] }) {
         <div className={styles.stage} data-gl-effect="displace">
           {views.map((v, i) => (
             <div key={v.src} className={styles.view} data-view data-gl-fade data-active={i === 0 ? "" : undefined} style={{ zIndex: views.length - i }}>
-              <Photo image={v} sizes="80vw" style={{ width: `min(76vw, calc(72svh * ${v.width / v.height}))` }} />
+              <Photo image={v} sizes="80vw" style={{ width: `min(76vw, calc(var(--ov-h) * ${v.width / v.height}))` }} />
             </div>
           ))}
         </div>

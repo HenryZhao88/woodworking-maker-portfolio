@@ -53,8 +53,8 @@
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .pin { height: auto; overflow: visible; perspective: 1200px; }
   .rail { display: none; }
-  .track { position: relative; flex-direction: column; align-items: stretch; padding: 0 var(--gutter) 10vh; gap: 12vh; }
-  .stage { flex-direction: column; align-items: stretch; gap: 48px; }
+  .track { position: relative; flex-direction: column; align-items: stretch; padding: 0 var(--gutter) 8vh; gap: 7vh; }
+  .stage { flex-direction: column; align-items: stretch; gap: 22px; }
   .stageHead { width: auto; }
   .card { width: 100%; height: auto; }
   .card > figure { height: auto; }

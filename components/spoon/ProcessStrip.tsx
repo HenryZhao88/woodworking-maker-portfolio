@@ -99,10 +99,11 @@ export function ProcessStrip({ process }: { process: Process }) {
 
       mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
         cards.forEach((c) =>
+          // Phones: a short, flat rise as each photo enters (deep 3D pushes left screens empty).
           gsap.fromTo(
             c,
-            { rotateX: 28, z: -240, yPercent: 20, opacity: 0.001 },
-            { rotateX: 0, z: 0, yPercent: 0, opacity: 1, ease: "power3.out", scrollTrigger: { trigger: c, start: "top 95%", end: "top 55%", scrub: 1 } }
+            { y: 56, scale: 0.94, opacity: 0 },
+            { y: 0, scale: 1, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: c, start: "top 100%", end: "top 78%", scrub: 0.6 } }
           )
         );
       });
@@ -148,7 +149,7 @@ export function ProcessStrip({ process }: { process: Process }) {
               {stage.images.map((img, ii) => {
                 const n = stageStart[si] + ii + 1;
                 return (
-                  <div key={img.src} className={styles.card} data-card style={{ ["--ar" as string]: img.width / img.height }}>
+                  <div key={img.src} className={styles.card} data-card data-gl-fade style={{ ["--ar" as string]: img.width / img.height }}>
                     <Photo image={img} sizes="(max-width: 767px) 88vw, 40vw" />
                     <span className={styles.cardNum}>{String(n).padStart(2, "0")}</span>
                   </div>

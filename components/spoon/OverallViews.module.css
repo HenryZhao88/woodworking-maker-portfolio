@@ -1,4 +1,4 @@
-.pin { position: relative; height: 100svh; overflow: hidden; display: grid; place-items: center; }
+.pin { position: relative; height: 100svh; overflow: hidden; display: grid; place-items: center; --ov-h: 72svh; }
 .copy { position: absolute; top: calc(var(--nav-h) + 3vh); left: var(--gutter); display: flex; flex-direction: column; gap: 14px; z-index: 5; }
 .h { font-size: clamp(36px, 4vw, 72px); }
 .stage { position: relative; width: 100%; height: 100%; perspective: 1800px; display: grid; place-items: center; }
@@ -19,6 +19,9 @@
 .label { font-size: 14px; color: var(--muted); margin-left: 12px; }
 @media (max-width: 767px) {
   .copy { top: calc(var(--nav-h) + 8px); }
+  /* Phones: photo sits in the band between the heading and the counter. */
+  .pin { --ov-h: 50svh; }
+  .stage { padding: calc(var(--nav-h) + 96px) 0 110px; box-sizing: border-box; }
 }
 .view { pointer-events: none; }
 .view[data-active] figure { pointer-events: auto; }

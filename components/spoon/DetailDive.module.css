@@ -2,7 +2,7 @@
 .block { height: 260svh; }
 .sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; }
 .frame { position: relative; will-change: transform; }
-.tag { position: absolute; top: calc(var(--nav-h) + 3vh); left: var(--gutter); z-index: 2; }
+.tag { position: absolute; top: calc(var(--nav-h) + 3vh); left: var(--gutter); z-index: 2; padding: 6px 12px; border-radius: 999px; background: rgba(14, 11, 8, 0.72); }
 /* Keeps the caption readable over light photo backgrounds (the canvas sits under the DOM). */
 .scrim {
   position: absolute;
