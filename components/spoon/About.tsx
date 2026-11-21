@@ -42,7 +42,7 @@ export function About({ about }: { about: NonNullable<Project["about"]> }) {
           {about.heading}
         </RevealText>
         {about.body.map((t, i) => (
-          <RevealText key={i} className={i === 0 ? styles.lede : styles.p}>
+          <RevealText key={i} effect="scrub" className={i === 0 ? styles.lede : styles.p}>
             <Rich text={t} />
           </RevealText>
         ))}

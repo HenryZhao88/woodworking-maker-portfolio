@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { test, expect } from "./fixtures";
+import { getProject } from "../../content/projects";
 
 const caretToEnd = (el: import("@playwright/test").Locator) =>
   el.evaluate((n) => {
@@ -25,7 +26,8 @@ test("local text editor: click text, type, save, and the source file changes", a
     await expect(page.getByRole("button", { name: /^Save/ })).toBeVisible({ timeout: 15000 });
 
     // A string from the content file (with a gold highlight inside it).
-    const lede = page.locator("main p", { hasText: "At the end of September" });
+    const ledeSource = getProject("wooden-spoon")!.about!.body[0];
+    const lede = page.locator("main p", { hasText: ledeSource.replace(/\*/g, "").slice(0, 24) });
     await lede.click();
     await caretToEnd(lede);
     await page.keyboard.type(" Test edit.");
@@ -39,7 +41,7 @@ test("local text editor: click text, type, save, and the source file changes", a
     await expect(page.getByText("Saved 2 changes")).toBeVisible({ timeout: 10000 });
 
     const content = fs.readFileSync(CONTENT, "utf8");
-    expect(content).toContain("*a small crossbar that sticks out on both sides*. Test edit.");
+    expect(content).toContain(JSON.stringify(`${ledeSource} Test edit.`));
     expect(fs.readFileSync(ABOUT, "utf8")).toContain("About the project!");
   } finally {
     fs.writeFileSync(CONTENT, before.content);

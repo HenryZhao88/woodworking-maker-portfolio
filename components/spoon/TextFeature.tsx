@@ -69,7 +69,7 @@ export function TextFeature({ eyebrow, heading, body, quote, image, variant, id 
         <div className={styles.copy}>
           {body.map((t, i) => (
             <Fragment key={i}>
-              <RevealText className={styles.p}>
+              <RevealText effect="scrub" className={styles.p}>
                 <Rich text={t} />
               </RevealText>
               {quote && i === 0 && (

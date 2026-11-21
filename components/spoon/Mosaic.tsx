@@ -45,7 +45,7 @@ export function Mosaic({ impression, images }: { impression: TextBlock; images: 
           {impression.heading}
         </RevealText>
         {impression.body.map((t, i) => (
-          <RevealText key={i} className={styles.p}>
+          <RevealText key={i} effect="scrub" className={styles.p}>
             <Rich text={t} />
           </RevealText>
         ))}

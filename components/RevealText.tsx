@@ -9,6 +9,8 @@ type Props = {
   as?: ElementType;
   split?: "chars" | "words" | "lines";
   trigger?: "scroll" | "mount";
+  /** "rise": pieces rise out of a mask once. "scrub": words light up one by one, tied to scroll. */
+  effect?: "rise" | "scrub";
   delay?: number;
   className?: string;
   id?: string;
@@ -17,7 +19,7 @@ type Props = {
 };
 
 /** Masked text reveal: pieces rise out of their own line box. */
-export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll", delay = 0, className, children, ...rest }: Props) {
+export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll", effect = "rise", delay = 0, className, children, ...rest }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -37,6 +39,24 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
       if (prefersReducedMotion()) {
         gsap.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8, delay, scrollTrigger: trigger === "scroll" ? { trigger: el, start: "top 88%" } : undefined });
         return;
+      }
+      if (effect === "scrub") {
+        // Story text: each word brightens as the reader scrolls through it (and dims again going back up).
+        const s = SplitText.create(el, {
+          type: "words",
+          aria: "none",
+          autoSplit: true,
+          onSplit(self) {
+            self.words.forEach((w) => w.setAttribute("data-word", ""));
+            return gsap.fromTo(
+              self.words,
+              { opacity: 0.18 },
+              { opacity: 1, ease: "none", stagger: 0.08, scrollTrigger: { trigger: el, start: "top 85%", end: "bottom 45%", scrub: 0.5 } }
+            );
+          },
+        });
+        gsap.set(el, { autoAlpha: 1 });
+        return () => s.revert();
       }
       const s = SplitText.create(el, {
         type: split === "chars" ? "lines,words,chars" : split === "words" ? "lines,words" : "lines",
