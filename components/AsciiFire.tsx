@@ -85,6 +85,7 @@ export function AsciiFire({ intensity, className }: { intensity: { current: numb
 
     resize();
     window.addEventListener("resize", resize);
+    canvas.setAttribute("data-running", ""); // drawing starts after hydration
 
     if (prefersReducedMotion()) {
       // A still frame: let the fire settle, then draw it once.

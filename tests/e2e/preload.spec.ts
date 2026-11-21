@@ -25,7 +25,7 @@ test("first visit to Home preloads every photo the spoon page will show (and pre
 
 raw("the loading screen shows an animated ASCII fire", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  const fire = page.locator("[data-loader] canvas[data-fire]");
+  const fire = page.locator("[data-loader] canvas[data-fire][data-running]");
   await rawExpect(fire).toBeVisible({ timeout: 5000 });
   // Read the canvas pixels directly (instant), twice, a few frames apart.
   // Sample while the loader is still up (once it hands off, the fire is told to die out).
