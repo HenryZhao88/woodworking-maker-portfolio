@@ -239,8 +239,9 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
 
   const lastSig = useRef<number[]>([]);
   useFrame((state) => {
-    const W = window.innerWidth;
-    const H = window.innerHeight;
+    // DOM markers are viewport-relative, but clip space covers the canvas's measured bounds.
+    // innerWidth includes classic scrollbars, which would squeeze and shift every photo plane.
+    const { width: W, height: H, left, top } = state.size;
     const vel = Math.round(velocity.current * 1000) / 1000; // the eased velocity decays forever; stop at 0.001
     const sig: number[] = [];
     const t = state.clock.elapsedTime;
@@ -255,7 +256,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       // corner markers: 0 bottom-left, 1 bottom-right, 2 top-right, 3 top-left (UV order)
       const q = p.corners.map((c) => {
         const r = c.getBoundingClientRect();
-        return [(r.left / W) * 2 - 1, 1 - (r.top / H) * 2];
+        return [((r.left - left) / W) * 2 - 1, 1 - ((r.top - top) / H) * 2];
       }) as Quad;
       const m = squareToQuad(q);
       (u.uH.value as THREE.Matrix3).set(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8]);
@@ -265,7 +266,7 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       const clip = u.uClip.value as THREE.Vector4;
       if (p.clipEl) {
         const c = p.clipEl.getBoundingClientRect(); // framebuffer y runs bottom-up
-        clip.set(c.left * dpr, (H - c.bottom) * dpr, c.right * dpr, (H - c.top) * dpr);
+        clip.set((c.left - left) * dpr, (H - (c.bottom - top)) * dpr, (c.right - left) * dpr, (H - (c.top - top)) * dpr);
       } else clip.copy(NO_CLIP);
       if (p.progressEl) u.uProgress.value = Number(p.progressEl.style.getPropertyValue("--p") || 0);
       p.mesh.visible = true;

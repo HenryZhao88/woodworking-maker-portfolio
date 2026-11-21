@@ -118,3 +118,30 @@ test.describe("reduced motion", () => {
     await expect(section.locator("[data-detail-frame] [data-photo]")).toHaveCount(3);
   });
 });
+
+for (const width of [1440, 390]) {
+  test(`rendered detail photo aligns with brackets with a scrollbar gutter (${width}px)`, async ({ page }) => {
+    test.skip(process.env.NO_WEBGL === "1", "WebGL projection regression");
+    const sharp = (await import("sharp")).default;
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/wooden-spoon");
+    // Reproduce the reserved space used by classic scrollbars, including in headless Chromium.
+    await page.addStyleTag({ content: "html { scrollbar-gutter: stable; }" });
+    await expect.poll(() => page.locator('canvas[data-engine^="three.js"]').evaluate((c) => c.getBoundingClientRect().width)).toBeLessThan(width);
+    for (const n of [1, 2, 3] as const) {
+      await scrollPin(page, "[data-details]", at[n]);
+      const photo = page.locator("[data-detail-frame][data-active] [data-photo]");
+      await expect(photo).toHaveAttribute("data-gl-ready", "");
+      await page.waitForTimeout(1600);
+      const box = (await photo.boundingBox())!;
+      // Sample away from the gold brackets: these photos have light backgrounds at both edges.
+      const strip = await page.screenshot({ clip: { x: 0, y: Math.ceil(box.y + 30), width, height: 1 } });
+      const { data, info } = await sharp(strip).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+      const bright = Array.from({ length: info.width }, (_, x) => x).filter((x) =>
+        data[x * 3] > 70 && data[x * 3 + 1] > 70 && data[x * 3 + 2] > 70
+      );
+      expect(Math.abs(bright[0] - box.x), `detail ${n}: rendered left edge`).toBeLessThanOrEqual(1);
+      expect(Math.abs(bright.at(-1)! + 1 - (box.x + box.width)), `detail ${n}: rendered right edge`).toBeLessThanOrEqual(1);
+    }
+  });
+}
