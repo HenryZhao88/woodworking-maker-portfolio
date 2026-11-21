@@ -8,6 +8,8 @@ import { useScene } from "./sceneStore";
 import { PlaneLayer } from "./PlaneLayer";
 import { HomeBackground } from "./HomeBackground";
 import { BootProbe } from "./BootProbe";
+import { RenderGate } from "./RenderGate";
+import { frameGate } from "./frameGate";
 import { GLErrorBoundary } from "./GLErrorBoundary";
 import styles from "./SceneCanvas.module.css";
 
@@ -31,6 +33,7 @@ export function SceneCanvas() {
       advance(performance.now() / 1000); // R3F "never" mode expects seconds
     };
     gsap.ticker.add(tick);
+    (window as unknown as { __glFrames: typeof frameGate }).__glFrames = frameGate;
     return () => gsap.ticker.remove(tick);
   }, [tier, lenis]);
 
@@ -57,6 +60,7 @@ export function SceneCanvas() {
         <HomeBackground particles={settings.particles} />
         <PlaneLayer velocity={velocity} />
         <BootProbe />
+        <RenderGate />
       </Canvas>
       </GLErrorBoundary>
     </div>

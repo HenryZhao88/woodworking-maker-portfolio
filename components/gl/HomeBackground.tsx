@@ -4,7 +4,12 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { useScene } from "./sceneStore";
-import { backdropFragment, backdropVertex, motesFragment, motesVertex } from "./shaders/backdrop";
+import { backdropFragment, backdropVertex, compositeFragment, motesFragment, motesVertex } from "./shaders/backdrop";
+import { markDirty } from "./frameGate";
+
+/** The backdrop drifts slowly: it is drawn at 30fps into a buffer at 75% of CSS resolution, then scaled up. */
+const BG_FPS = 30;
+const BG_SCALE = 0.75;
 
 type Uniforms = {
   uTime: { value: number };
@@ -32,6 +37,7 @@ export function HomeBackground({ particles }: { particles: number }) {
   const sceneName = useScene((s) => s.scene);
   const uniforms = useRef<Uniforms | null>(null);
   const timeScale = useRef(1);
+  const bg = useRef<{ scene: THREE.Scene; rt: THREE.WebGLRenderTarget; seed: { value: number }; last: number } | null>(null);
 
   // Build the scene objects imperatively (they are GPU resources, not React state).
   useEffect(() => {
@@ -51,7 +57,6 @@ export function HomeBackground({ particles }: { particles: number }) {
       new THREE.ShaderMaterial({ vertexShader: backdropVertex, fragmentShader: backdropFragment, uniforms: u, depthTest: false, depthWrite: false })
     );
     quad.frustumCulled = false;
-    quad.renderOrder = -10;
 
     const rand = mulberry32(7);
     const seeds = new Float32Array(particles * 4);
@@ -69,8 +74,25 @@ export function HomeBackground({ particles }: { particles: number }) {
       new THREE.ShaderMaterial({ vertexShader: motesVertex, fragmentShader: motesFragment, uniforms: u, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending })
     );
     motes.frustumCulled = false;
-    motes.renderOrder = -9;
-    scene.add(quad, motes);
+    motes.renderOrder = 1;
+    const bgScene = new THREE.Scene();
+    bgScene.add(quad, motes);
+    const rt = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false });
+    const seed = { value: 0 };
+    const composite = new THREE.Mesh(
+      new THREE.PlaneGeometry(2, 2),
+      new THREE.ShaderMaterial({
+        vertexShader: backdropVertex,
+        fragmentShader: compositeFragment,
+        uniforms: { uBg: { value: rt.texture }, uRes: u.uRes, uSeed: seed },
+        depthTest: false,
+        depthWrite: false,
+      })
+    );
+    composite.frustumCulled = false;
+    composite.renderOrder = -10;
+    scene.add(composite);
+    bg.current = { scene: bgScene, rt, seed, last: -Infinity };
 
     // Subtle cursor drift (fine pointers only, never under reduced motion).
     let move: ((e: PointerEvent) => void) | null = null;
@@ -86,7 +108,11 @@ export function HomeBackground({ particles }: { particles: number }) {
 
     return () => {
       if (move) window.removeEventListener("pointermove", move);
-      scene.remove(quad, motes);
+      scene.remove(composite);
+      composite.geometry.dispose();
+      (composite.material as THREE.Material).dispose();
+      rt.dispose();
+      bg.current = null;
       quad.geometry.dispose();
       (quad.material as THREE.Material).dispose();
       geo.dispose();
@@ -106,13 +132,28 @@ export function HomeBackground({ particles }: { particles: number }) {
     };
   }, [sceneName]);
 
-  useFrame((_, delta) => {
+  useFrame(({ camera }, delta) => {
     const u = uniforms.current;
-    if (!u) return;
+    const b = bg.current;
+    if (!u || !b) return;
     u.uTime.value += delta * timeScale.current;
-    u.uRes.value.set(window.innerWidth, window.innerHeight);
-    u.uPixelRatio.value = gl.getPixelRatio();
-    u.uScroll.value = Math.min(1, window.scrollY / window.innerHeight);
+    const now = performance.now();
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const w = Math.max(1, Math.round(W * BG_SCALE));
+    const h = Math.max(1, Math.round(H * BG_SCALE));
+    const resized = b.rt.width !== w || b.rt.height !== h;
+    if (!resized && now - b.last < 1000 / BG_FPS - 2) return;
+    b.last = now;
+    if (resized) b.rt.setSize(w, h);
+    u.uRes.value.set(W, H);
+    u.uPixelRatio.value = 1; // motes keep their on-screen size (a touch larger than 75% buffer pixels, so the smallest stay visible)
+    u.uScroll.value = Math.min(1, window.scrollY / H);
+    b.seed.value = u.uTime.value % 1;
+    gl.setRenderTarget(b.rt);
+    gl.render(b.scene, camera);
+    gl.setRenderTarget(null);
+    markDirty();
   });
 
   return null;

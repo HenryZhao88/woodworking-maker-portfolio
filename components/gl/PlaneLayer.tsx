@@ -9,6 +9,7 @@ import type { QualityTier } from "@/lib/quality";
 import { useScene } from "./sceneStore";
 import { isBootDone } from "@/components/bootGate";
 import { planeFragment, planeVertex, PLANE_MODE } from "./shaders/plane";
+import { markDirty } from "./frameGate";
 
 type Plane = {
   fig: HTMLElement;
@@ -236,10 +237,12 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
     };
   }, [group, pathname, tier]);
 
+  const lastSig = useRef<number[]>([]);
   useFrame((state) => {
     const W = window.innerWidth;
     const H = window.innerHeight;
-    const vel = velocity.current;
+    const vel = Math.round(velocity.current * 1000) / 1000; // the eased velocity decays forever; stop at 0.001
+    const sig: number[] = [];
     const t = state.clock.elapsedTime;
     const dpr = state.gl.getPixelRatio();
     planes.current.forEach((p) => {
@@ -266,7 +269,15 @@ export function PlaneLayer({ velocity }: { velocity: { current: number } }) {
       } else clip.copy(NO_CLIP);
       if (p.progressEl) u.uProgress.value = Number(p.progressEl.style.getPropertyValue("--p") || 0);
       p.mesh.visible = true;
+      // Everything that changes what this plane draws; time only matters mid-fade for the animated cuts.
+      const animated = alpha < 0.999 && (u.uMode.value === PLANE_MODE.displace || u.uMode.value === PLANE_MODE.inspect);
+      sig.push(p.mesh.id, ...m, alpha, vel, clip.x, clip.y, clip.z, clip.w, u.uProgress.value, animated ? t : 0);
     });
+    const prev = lastSig.current;
+    if (sig.length !== prev.length || sig.some((v, i) => v !== prev[i])) {
+      lastSig.current = sig;
+      markDirty();
+    }
   });
 
   return null;

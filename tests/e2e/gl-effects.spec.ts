@@ -77,3 +77,39 @@ test("page change builds photo textures off the main thread, one decode at a tim
   expect(d.max, "parallel decodes").toBe(1);
   expect(d.draw2d, "photos resized on the main thread").toBe(0);
 });
+
+test("a still page stops redrawing at full rate; scrolling redraws every frame", async ({ page }) => {
+  test.skip(process.env.NO_WEBGL === "1", "WebGL only");
+  await page.goto("/wooden-spoon");
+  await page.waitForFunction(() => !!(window as unknown as { __glFrames?: object }).__glFrames, null, { timeout: 20000 });
+  await page.waitForTimeout(2500);
+  // Count display frames and canvas redraws over the same window.
+  const rate = (scroll: boolean) =>
+    page.evaluate(async (scroll) => {
+      const g = (window as unknown as { __glFrames: { renders: number } }).__glFrames;
+      const lenis = (window as unknown as { __lenis: { scrollTo: (y: number, o: object) => void } }).__lenis;
+      let frames = 0;
+      const r0 = g.renders;
+      const t0 = performance.now();
+      await new Promise<void>((done) => {
+        const f = () => {
+          frames++;
+          if (scroll) lenis.scrollTo(scrollY + 6, { immediate: true, force: true });
+          if (performance.now() - t0 < 2000) requestAnimationFrame(f);
+          else done();
+        };
+        requestAnimationFrame(f);
+      });
+      return { frames, renders: g.renders - r0 };
+    }, scroll);
+  const idle = await rate(false);
+  // At rest only the backdrop changes, at 30fps: at most ~60 redraws in 2s, whatever the display rate.
+  expect(idle.renders, `idle: ${JSON.stringify(idle)}`).toBeLessThanOrEqual(68);
+  expect(idle.renders, "the backdrop still drifts").toBeGreaterThan(10);
+  // Scroll among the process photos, so photo planes are on screen and must follow the page every frame.
+  const y = await page.locator("[data-process] [data-card]").first().evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  await page.evaluate((y) => (window as unknown as { __lenis: { scrollTo: (y: number, o: object) => void } }).__lenis.scrollTo(y - 200, { immediate: true, force: true }), y);
+  await page.waitForTimeout(1500);
+  const moving = await rate(true);
+  expect(moving.renders, `scroll: ${JSON.stringify(moving)}`).toBeGreaterThan(moving.frames * 0.8);
+});

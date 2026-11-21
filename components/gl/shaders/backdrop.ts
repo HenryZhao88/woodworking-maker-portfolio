@@ -40,8 +40,22 @@ void main() {
   col *= smoothstep(1.35, 0.25, length(p * vec2(0.85, 1.0)));     // vignette
   col = mix(col, base + (col - base) * 0.38, uMix);               // calmer on project pages
   col *= 1.0 - uScroll * 0.45;
-  col += (hash(vUv * uRes + fract(uTime)) - 0.5) * 0.012;         // film grain
   gl_FragColor = vec4(col, 1.0); // colors authored in sRGB: no output conversion
+}
+`;
+
+/** Draws the low-res backdrop (grain + motes) full screen, with the film grain added at full resolution. */
+export const compositeFragment = /* glsl */ `
+precision highp float;
+uniform sampler2D uBg;
+uniform vec2 uRes;
+uniform float uSeed;
+varying vec2 vUv;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+void main() {
+  vec3 col = texture2D(uBg, vUv).rgb;
+  col += (hash(vUv * uRes + uSeed) - 0.5) * 0.012; // film grain
+  gl_FragColor = vec4(col, 1.0);
 }
 `;
 
