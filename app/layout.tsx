@@ -10,6 +10,7 @@ import { SceneDriver } from "@/components/gl/SceneDriver";
 import { RouteTransitionProvider } from "@/components/transitions/RouteTransition";
 import { Loader } from "@/components/Loader";
 import { DevEditor } from "@/components/DevEditor";
+import { pageMeta, siteUrl } from "@/lib/site";
 
 // Switzer (Fontshare, free licence): one Swiss sans for titles, text and UI.
 const switzer = localFont({
@@ -38,8 +39,9 @@ const boska = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: { default: "Maker Portfolio · Henry Zhao", template: "%s · Maker Portfolio" },
-  description: "A woodworking maker portfolio by Henry Zhao.",
+  ...pageMeta({ path: "/", description: "Henry Zhao's woodworking portfolio from fall 2026: a spoon carved from one block of wood, shown from the first drawing to the oil finish." }),
 };
 
 export const viewport: Viewport = { themeColor: "#0e0b08" };
@@ -48,6 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${switzer.variable} ${zodiak.variable} ${boska.variable}`}>
       <body>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <SmoothScroll>
           <QualityGate />
           <Loader />

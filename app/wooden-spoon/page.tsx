@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProject } from "@/content/projects";
+import { pageMeta } from "@/lib/site";
 import { mosaicImages } from "@/lib/preload";
 import { Hero } from "@/components/spoon/Hero";
 import { About } from "@/components/spoon/About";
@@ -10,13 +10,17 @@ import { ProcessStrip } from "@/components/spoon/ProcessStrip";
 import { OverallViews } from "@/components/spoon/OverallViews";
 import { DetailDive } from "@/components/spoon/DetailDive";
 
-export const metadata: Metadata = { title: "Wooden Spoon" };
+export const metadata = pageMeta({
+  title: "Wooden Spoon",
+  path: "/wooden-spoon",
+  description: "How I turned a block of wood into a spoon over seven weeks: grid-paper drawings, a drill press, a gouge, the band saw, a lot of sanding and one emergency glue job.",
+});
 
 export default function WoodenSpoon() {
   const p = getProject("wooden-spoon");
   if (!p || !p.about || !p.favorite || !p.challenging || !p.impression || !p.process || !p.finished) notFound();
   return (
-    <main style={{ position: "relative", zIndex: 1 }}>
+    <main id="main" tabIndex={-1} style={{ position: "relative", zIndex: 1 }}>
       <Hero title={p.title} index="01" />
       <About about={p.about} />
       <ProcessStrip process={p.process} />

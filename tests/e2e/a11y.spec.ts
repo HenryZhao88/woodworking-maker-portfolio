@@ -1,3 +1,4 @@
+import { test as raw } from "@playwright/test";
 import { test, expect } from "./fixtures";
 import { scrollToY } from "./helpers";
 
@@ -28,6 +29,34 @@ test("reduced motion: every heading and photo is visible after scrolling through
   });
   expect(hidden).toEqual([]);
 });
+
+raw.describe("reduced motion, first paint", () => {
+  raw.use({ reducedMotion: "reduce" });
+  raw("no loading screen: the page is readable on first paint", async ({ page }) => {
+  await page.goto("/", { waitUntil: "commit" });
+  await page.waitForSelector("h1", { state: "attached" });
+  // Before any script runs, the loader must already be out of the way.
+  expect(await page.locator("[data-loader]").isVisible(), "loader covers the first paint").toBe(false);
+  await expect(page.locator("html[data-loader-done]")).toBeAttached({ timeout: 3000 });
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+});
+
+for (const path of ["/", "/wooden-spoon"]) {
+  test(`reduced motion: all text on ${path} is visible at once, without waiting for scroll`, async ({ page }) => {
+    await page.goto(path);
+    await page.waitForTimeout(800);
+    const hidden = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main p")]
+        .filter((e) => {
+          const cs = getComputedStyle(e);
+          return e.getBoundingClientRect().height > 0 && (cs.visibility === "hidden" || Number(cs.opacity) < 0.05);
+        })
+        .map((e) => e.textContent?.trim().slice(0, 40))
+    );
+    expect(hidden).toEqual([]);
+  });
+}
 
 test("reduced motion: no pinned section adds more than one viewport of scroll", async ({ page }) => {
   await page.goto("/wooden-spoon");

@@ -6,7 +6,7 @@ import styles from "./home.module.css";
 export default function Home() {
   const spoon = getProject("wooden-spoon")!;
   return (
-    <main className={styles.main}>
+    <main id="main" tabIndex={-1} className={styles.main}>
       <section className={styles.hero} aria-label="Intro">
         <div className={styles.meta}>
           <span className="eyebrow">Woodworking</span>

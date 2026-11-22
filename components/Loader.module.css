@@ -33,3 +33,7 @@
 @media (max-width: 767px) {
   .pct { top: auto; bottom: calc(100% + 34px); }
 }
+/* Reduced motion: no loading screen at all. The page shows on first paint; photos still prefetch behind it. */
+@media (prefers-reduced-motion: reduce) {
+  .loader { display: none; }
+}

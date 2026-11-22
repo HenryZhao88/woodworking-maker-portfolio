@@ -37,7 +37,8 @@ export function RevealText({ as: Tag = "p", split = "lines", trigger = "scroll",
         return;
       }
       if (prefersReducedMotion()) {
-        gsap.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8, delay, scrollTrigger: trigger === "scroll" ? { trigger: el, start: "top 88%" } : undefined });
+        // Reduced motion: the words are simply there, never held back for a scroll position.
+        gsap.set(el, { autoAlpha: 1 });
         return;
       }
       if (effect === "scrub") {

@@ -13,3 +13,6 @@ images/
 
 # generated photo sizes (scripts/image-variants.mjs)
 /public/img/
+
+# QA screenshots
+/.shots/

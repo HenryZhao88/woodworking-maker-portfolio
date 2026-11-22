@@ -99,6 +99,13 @@ export function Loader() {
 
   // Progress readout + finish.
   useEffect(() => {
+    if (prefersReducedMotion()) {
+      // The CSS already hides the loader; the page is live from the first frame.
+      const tl = gsap.timeline({ onComplete: () => setMounted(false) }).call(finishBoot);
+      return () => {
+        tl.kill();
+      };
+    }
     const t0 = performance.now();
     const gate = bootGate();
     let shown = 0;

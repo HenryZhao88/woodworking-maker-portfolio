@@ -1,0 +1,29 @@
+.main {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: var(--nav-h) var(--gutter);
+}
+.title { font-size: clamp(56px, 11vw, 200px); }
+.copy { max-width: 34ch; font-size: clamp(18px, 1.6vw, 24px); color: var(--muted); }
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 18px 28px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  color: var(--gold);
+  transition: background 0.5s var(--ease-out), color 0.5s var(--ease-out);
+}
+.link:hover { background: var(--gold); color: var(--bg); }
+.arrow { transition: transform 0.5s var(--ease-out); }
+.link:hover .arrow { transform: translateX(6px); }
