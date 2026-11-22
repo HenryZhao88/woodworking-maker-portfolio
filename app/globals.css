@@ -146,3 +146,11 @@ html.lenis body {
   outline-offset: 3px;
 }
 main:focus { outline: none; }
+
+/* Keyboard focus in the site's own color, not the browser's blue. */
+:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+p { text-wrap: pretty; }

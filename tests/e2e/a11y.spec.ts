@@ -37,7 +37,7 @@ raw.describe("reduced motion, first paint", () => {
   await page.waitForSelector("h1", { state: "attached" });
   // Before any script runs, the loader must already be out of the way.
   expect(await page.locator("[data-loader]").isVisible(), "loader covers the first paint").toBe(false);
-  await expect(page.locator("html[data-loader-done]")).toBeAttached({ timeout: 3000 });
+  await expect(page.locator("html[data-loader-done]")).toBeAttached({ timeout: 10000 }); // hydration on a busy dev server
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });

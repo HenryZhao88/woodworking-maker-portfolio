@@ -9,7 +9,7 @@
   padding: var(--nav-h) var(--gutter);
 }
 .title { font-size: clamp(56px, 11vw, 200px); }
-.copy { max-width: 34ch; font-size: clamp(18px, 1.6vw, 24px); color: var(--muted); }
+.copy { text-wrap: balance; max-width: 34ch; font-size: clamp(18px, 1.6vw, 24px); color: var(--muted); }
 .link {
   display: inline-flex;
   align-items: center;
